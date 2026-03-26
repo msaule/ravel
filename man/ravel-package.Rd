@@ -12,6 +12,7 @@ Ravel is an RStudio-native coding and analytics copilot for R users.
 Useful links:
 \itemize{
   \item \url{https://github.com/msaule/ravel}
+  \item \url{https://msaule.github.io/ravel/}
   \item Report bugs at \url{https://github.com/msaule/ravel/issues}
 }
 

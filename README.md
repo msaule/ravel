@@ -7,6 +7,7 @@
 [![R-CMD-check](https://github.com/msaule/ravel/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/msaule/ravel/actions/workflows/R-CMD-check.yaml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://github.com/msaule/ravel)
+[![Docs](https://img.shields.io/badge/docs-pkgdown-2c5f5d.svg)](https://msaule.github.io/ravel/)
 
 Ravel is an RStudio/Posit-native coding and analytics copilot for R users.
 
@@ -202,6 +203,7 @@ Ravel does not silently execute generated code by default.
 
 ## Repository guide
 
+- Package website: <https://msaule.github.io/ravel/>
 - [ARCHITECTURE.md](ARCHITECTURE.md) explains the layers and execution model.
 - [ROADMAP.md](ROADMAP.md) lays out the planned phases beyond the MVP.
 - [CONTRIBUTING.md](CONTRIBUTING.md) explains the developer workflow and release checks.

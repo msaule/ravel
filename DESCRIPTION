@@ -10,7 +10,8 @@ Description: An RStudio and Posit native AI copilot for R users with
     reproducible 'Quarto' content, and connects to official provider
     APIs or CLIs for OpenAI, GitHub Copilot, Gemini, and Anthropic.
 License: MIT + file LICENSE
-URL: https://github.com/msaule/ravel
+URL: https://github.com/msaule/ravel,
+    https://msaule.github.io/ravel/
 BugReports: https://github.com/msaule/ravel/issues
 Language: en-US
 Encoding: UTF-8
