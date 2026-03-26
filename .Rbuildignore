@@ -1,0 +1,7 @@
+(^|[\\/])\.github($|[\\/])
+(^|[\\/])\.lintr$
+(^|[\\/])README\.md$
+(^|[\\/])AGENTS\.md$
+(^|[\\/])ROADMAP\.md$
+(^|[\\/])ARCHITECTURE\.md$
+(^|[\\/])LICENSE\.md$

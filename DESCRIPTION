@@ -1,0 +1,34 @@
+Package: ravel
+Title: RStudio Native AI Copilot for R Analysis Workflows
+Version: 0.0.1
+Authors@R: 
+    person("Ravel", "Contributors", , "opensource@ravel.dev", role = c("aut", "cre"))
+Description: An RStudio and Posit native AI copilot for R users with
+    project context, object awareness, model interpretation helpers,
+    Quarto drafting, safe code execution, and multi-provider support.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Depends:
+    R (>= 4.2.0)
+Imports:
+    cli,
+    digest,
+    httr2,
+    jsonlite,
+    miniUI,
+    rstudioapi,
+    shiny,
+    stats,
+    tibble,
+    tools,
+    utils
+Suggests:
+    keyring,
+    knitr,
+    lintr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+VignetteBuilder: knitr
+Config/testthat/edition: 3

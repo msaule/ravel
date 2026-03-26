@@ -1,0 +1,8 @@
+## Results
+
+```{r}
+# Add analysis code here
+```
+
+Describe the main result in clear language, including effect sizes,
+uncertainty, and practical interpretation.

@@ -1,0 +1,75 @@
+---
+title: "Ravel MVP Walkthrough"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Ravel MVP Walkthrough}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# What Ravel is
+
+Ravel is an RStudio-native analytics copilot for R users. The MVP focuses on:
+
+- context-aware chat orchestration
+- provider abstraction
+- safe code staging and execution
+- model interpretation helpers
+- Quarto drafting helpers
+
+# Provider support
+
+```{r}
+ravel::ravel_list_providers()
+```
+
+The provider layer keeps auth and capability boundaries explicit. OpenAI, Gemini,
+and Anthropic can run over official HTTP APIs. GitHub Copilot is kept behind the
+official `gh copilot` CLI surface when available.
+
+# Analysis-aware helpers
+
+```{r}
+fit <- lm(mpg ~ wt * am, data = mtcars)
+ravel::ravel_summarize_model(fit)
+cat(ravel::ravel_interpret_model(fit))
+```
+
+```{r}
+ravel::ravel_suggest_diagnostics(fit)
+```
+
+# Safe execution
+
+```{r}
+action <- ravel::ravel_preview_code("summary(mtcars$mpg)")
+approved <- ravel::ravel_approve_action(action)
+ravel::ravel_run_code(approved)
+```
+
+# Quarto drafting
+
+```{r}
+cat(ravel::ravel_draft_quarto_section("diagnostics", model = fit))
+```
+
+# RStudio addin
+
+After installation, launch the chat gadget with:
+
+```r
+ravel::ravel_chat_addin()
+```
+
+Use the settings gadget to configure default providers or store API keys:
+
+```r
+ravel::ravel_settings_addin()
+```

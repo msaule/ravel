@@ -1,0 +1,7 @@
+## Diagnostics
+
+```{r}
+# Add diagnostic code here
+```
+
+Summarize model assumptions, notable diagnostics, and any caveats.

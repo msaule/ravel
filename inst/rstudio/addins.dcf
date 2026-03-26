@@ -1,0 +1,9 @@
+Name: Ravel Chat
+Description: Launch the Ravel chat copilot gadget.
+Binding: ravel_chat_addin
+Interactive: true
+
+Name: Ravel Settings
+Description: Launch the Ravel settings gadget.
+Binding: ravel_settings_addin
+Interactive: true
