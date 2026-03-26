@@ -279,7 +279,7 @@ ravel_launch_chat_gadget <- function() {
     })
   }
 
-  shiny::runGadget(ui, server, viewer = shiny::dialogViewer("Ravel", width = 1200, height = 900))
+  shiny::runGadget(ui, server, viewer = ravel_gadget_viewer("chat"))
 }
 
 ravel_launch_settings_gadget <- function() {
@@ -377,9 +377,5 @@ ravel_launch_settings_gadget <- function() {
     })
   }
 
-  shiny::runGadget(
-    ui,
-    server,
-    viewer = shiny::dialogViewer("Ravel Settings", width = 700, height = 700)
-  )
+  shiny::runGadget(ui, server, viewer = ravel_gadget_viewer("settings"))
 }

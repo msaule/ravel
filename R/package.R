@@ -105,6 +105,23 @@ ravel_cli_alert <- function(..., class = "info") {
   )
 }
 
+ravel_is_rstudio_available <- function() {
+  isTRUE(tryCatch(rstudioapi::isAvailable(), error = function(e) FALSE))
+}
+
+ravel_gadget_viewer <- function(kind = c("chat", "settings")) {
+  kind <- match.arg(kind)
+
+  if (ravel_is_rstudio_available()) {
+    if (identical(kind, "chat")) {
+      return(shiny::paneViewer(minHeight = 900))
+    }
+    return(shiny::dialogViewer("Ravel Settings", width = 700, height = 700))
+  }
+
+  shiny::browserViewer()
+}
+
 ravel_perform_request <- function(req, provider) {
   tryCatch(
     httr2::req_perform(req),
