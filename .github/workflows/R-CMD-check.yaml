@@ -5,6 +5,9 @@ on:
   pull_request:
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   R-CMD-check:
     runs-on: ${{ matrix.config.os }}
@@ -44,6 +47,7 @@ jobs:
         run: Rscript -e "lintr::lint_package()"
   pkgdown:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [R-CMD-check, lint]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -57,7 +61,7 @@ jobs:
         with:
           extra-packages: any::pkgdown, any::devtools
       - name: Build site
-        run: Rscript -e "pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)"
+        run: Rscript -e "pkgdown::build_site_github_pages(new_process = FALSE, install = TRUE)"
       - name: Deploy site
         uses: peaceiris/actions-gh-pages@v3
         with:
