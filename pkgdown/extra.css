@@ -11,8 +11,10 @@
 
 body {
   color: var(--ravel-ink);
-  background:
-    linear-gradient(180deg, #f7f1e8 0, #fcfaf6 240px, #fffdf9 241px, #fffdf9 100%);
+  background-color: #fcfaf6;
+  background-image:
+    radial-gradient(circle at top center, rgba(214, 190, 156, 0.16) 0, rgba(214, 190, 156, 0.08) 18%, rgba(214, 190, 156, 0) 48%);
+  background-repeat: no-repeat;
 }
 
 .navbar,
