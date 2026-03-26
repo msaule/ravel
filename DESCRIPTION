@@ -1,6 +1,6 @@
 Package: ravel
 Title: RStudio-Native AI Copilot for R Analysis Workflows
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: 
     person("Markuss", "Saule", , "markusstomas@gmail.com", role = c("aut", "cre", "cph"))
 Description: An RStudio and Posit native AI copilot for R users with

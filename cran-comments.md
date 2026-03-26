@@ -5,10 +5,12 @@
 
 ## R CMD check results
 
-0 errors | 0 warnings | 0 notes
+0 errors | 0 warnings | 2 notes
 
 ## Notes
 
 - This is an initial CRAN submission.
+- One note is the expected "New submission" incoming check.
+- One local Windows note reports "unable to verify current time", which appears to be environment-specific.
 - Provider integrations use official APIs or official CLIs only.
 - Network-backed providers are not contacted in examples or tests.

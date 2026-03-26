@@ -1,3 +1,9 @@
+# ravel 0.1.1
+
+- Tightened install guidance with a resilient `pak`-first quick start.
+- Added a release-assets GitHub Actions workflow so tagged releases upload source tarballs automatically.
+- Simplified the root license files so the repository presents a canonical MIT license.
+
 # ravel 0.1.0
 
 - Initial public MVP for an RStudio-native analytics copilot for R.

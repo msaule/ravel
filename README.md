@@ -5,7 +5,8 @@
 # Ravel
 
 [![R-CMD-check](https://github.com/msaule/ravel/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/msaule/ravel/actions/workflows/R-CMD-check.yaml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/msaule/ravel?display_name=tag)](https://github.com/msaule/ravel/releases)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.txt)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://github.com/msaule/ravel)
 [![Docs](https://img.shields.io/badge/docs-pkgdown-2c5f5d.svg)](https://msaule.github.io/ravel/)
 
@@ -16,7 +17,7 @@ It is designed for code generation, object-aware analysis, statistical interpret
 ## Quick start
 
 ```r
-install.packages("pak")
+if (!requireNamespace("pak", quietly = TRUE)) install.packages("pak")
 pak::pak("msaule/ravel")
 library(ravel)
 ravel::ravel_setup_addin()
@@ -77,12 +78,15 @@ If a provider is unavailable or only partially supported, Ravel surfaces that cl
 For regular users, the easiest install path today is:
 
 ```r
-install.packages("pak")
+if (!requireNamespace("pak", quietly = TRUE)) install.packages("pak")
 pak::pak("msaule/ravel")
 ```
 
 This installs Ravel and its package dependencies without requiring you to
 manually list them one by one.
+
+If you prefer a GitHub release artifact instead of `pak`, tagged releases now
+also ship a source tarball on the Releases page.
 
 Optional but recommended:
 

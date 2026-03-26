@@ -1,10 +1,10 @@
 (^|[\\/])\.github($|[\\/])
 (^|[\\/])\.lintr$
+^LICENSE\.txt$
 (^|[\\/])README\.md$
 (^|[\\/])AGENTS\.md$
 (^|[\\/])ROADMAP\.md$
 (^|[\\/])ARCHITECTURE\.md$
-(^|[\\/])LICENSE\.md$
 ^CODE_OF_CONDUCT\.md$
 ^CONTRIBUTING\.md$
 ^RELEASING\.md$
