@@ -1,29 +1,91 @@
-ravel_render_messages <- function(messages) {
-  if (!length(messages)) {
-    return(
+ravel_escape_html <- function(text) {
+  text <- text %||% ""
+  text <- gsub("&", "&amp;", text, fixed = TRUE)
+  text <- gsub("<", "&lt;", text, fixed = TRUE)
+  text <- gsub(">", "&gt;", text, fixed = TRUE)
+  text <- gsub("\"", "&quot;", text, fixed = TRUE)
+  gsub("'", "&#39;", text, fixed = TRUE)
+}
+
+ravel_message_role_class <- function(role) {
+  switch(
+    role %||% "assistant",
+    user = "ravel-message-user",
+    assistant = "ravel-message-assistant",
+    system = "ravel-message-system",
+    "ravel-message-system"
+  )
+}
+
+ravel_message_heading <- function(message) {
+  role <- message$role %||% "assistant"
+  role_label <- switch(
+    role,
+    user = "You",
+    assistant = "Ravel",
+    system = "System",
+    "Ravel"
+  )
+
+  extras <- c(message$provider %||% NULL, message$model %||% NULL)
+  extras <- extras[nzchar(extras)]
+  if (!length(extras)) {
+    return(role_label)
+  }
+
+  paste(role_label, paste(extras, collapse = " | "), sep = " | ")
+}
+
+ravel_render_message_html <- function(message) {
+  sprintf(
+    paste0(
+      "<div class='ravel-message %s'>",
+      "<div class='ravel-message-head'>%s</div>",
+      "<div class='ravel-message-body'>%s</div>",
+      "</div>"
+    ),
+    ravel_message_role_class(message$role),
+    ravel_escape_html(ravel_message_heading(message)),
+    ravel_escape_html(message$content %||% "")
+  )
+}
+
+ravel_render_messages_ui <- function(messages, waiting = FALSE) {
+  if (!length(messages) && !isTRUE(waiting)) {
+    return(shiny::HTML(paste(
+      "<div class='ravel-empty-state'>",
+      "<div class='ravel-empty-title'>Ravel is ready.</div>",
+      "<div class='ravel-empty-body'>",
+      "Ask about selected code, loaded objects, model output, diagnostics,",
+      "or Quarto drafting.",
+      "</div>",
+      "</div>",
+      sep = "\n"
+    )))
+  }
+
+  blocks <- vapply(messages, ravel_render_message_html, character(1))
+
+  if (isTRUE(waiting)) {
+    blocks <- c(
+      blocks,
       paste(
-        "Ravel is ready.",
-        "",
-        "Ask about selected code, loaded objects, model output, or Quarto drafting.",
+        "<div class='ravel-message ravel-message-assistant ravel-message-waiting'>",
+        "<div class='ravel-message-head'>Ravel</div>",
+        "<div class='ravel-message-body'>",
+        "<span class='ravel-spinner' aria-hidden='true'></span>",
+        "Waiting for a response...",
+        "</div>",
+        "</div>",
         sep = "\n"
       )
     )
   }
 
-  blocks <- vapply(messages, function(msg) {
-    provider <- if (!is.null(msg$provider)) paste0(" [", msg$provider, "]") else ""
-    paste0(
-      toupper(msg$role %||% "user"),
-      provider,
-      "\n",
-      msg$content %||% ""
-    )
-  }, character(1))
-
-  paste(blocks, collapse = "\n\n")
+  shiny::HTML(paste(blocks, collapse = "\n"))
 }
 
-ravel_collect_context_from_ui <- function(selected, envir = .GlobalEnv) {
+ravel_collect_context_from_ui <- function(selected, envir = globalenv()) {
   ravel_collect_context(
     include_selection = "selection" %in% selected,
     include_file = "file" %in% selected,
@@ -49,78 +111,276 @@ ravel_insert_active_doc <- function(text) {
 ravel_launch_chat_gadget <- function() {
   settings <- ravel_read_settings()
   providers <- ravel_list_providers()
-  default_context <- names(Filter(isTRUE, settings$context_defaults))
+  default_context <- names(Filter(base::isTRUE, settings$context_defaults))
 
   ui <- miniUI::miniPage(
     shiny::tags$head(
       shiny::tags$style(shiny::HTML("
-        .ravel-transcript textarea {
-          font-family: Consolas, 'Courier New', monospace;
-          background: #faf7f1;
+        .ravel-shell {
+          background: linear-gradient(180deg, #f7f1e6 0%, #f3efe7 100%);
+          min-height: 100%;
         }
         .ravel-panel {
           border-left: 4px solid #2c5f5d;
           padding-left: 12px;
         }
+        .ravel-chat-shell,
+        .ravel-compose-shell,
+        .ravel-preview-shell {
+          background: #fffdf8;
+          border: 1px solid #d8d1c3;
+          border-radius: 14px;
+          box-shadow: 0 8px 20px rgba(67, 58, 45, 0.08);
+          padding: 14px 16px;
+          margin-bottom: 14px;
+        }
+        .ravel-chat-topline {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 10px;
+        }
+        .ravel-chat-title {
+          font-size: 18px;
+          font-weight: 700;
+          color: #2a2a24;
+        }
+        .ravel-chat-subtitle {
+          font-size: 12px;
+          color: #6c655b;
+          margin-top: 2px;
+        }
+        .ravel-status-chip {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          background: #ece7da;
+          border-radius: 999px;
+          padding: 7px 12px;
+          color: #433a2d;
+          font-size: 12px;
+          font-weight: 600;
+        }
+        .ravel-status-chip-waiting {
+          background: #dceceb;
+          color: #1f4b49;
+        }
+        .ravel-chat-log {
+          height: 440px;
+          overflow-y: auto;
+          padding: 8px 6px 6px 2px;
+          background: linear-gradient(180deg, #fdf9f1 0%, #f8f3ea 100%);
+          border-radius: 12px;
+          border: 1px solid #ebe4d8;
+        }
+        .ravel-message {
+          max-width: 90%;
+          border-radius: 16px;
+          padding: 12px 14px;
+          margin: 0 0 12px 0;
+          box-shadow: 0 4px 14px rgba(67, 58, 45, 0.06);
+        }
+        .ravel-message-user {
+          margin-left: auto;
+          background: #2c5f5d;
+          color: #f8fbfb;
+        }
+        .ravel-message-assistant {
+          margin-right: auto;
+          background: #ffffff;
+          color: #2e2b27;
+          border: 1px solid #ddd5c7;
+        }
+        .ravel-message-system {
+          margin-right: auto;
+          background: #f2efe7;
+          color: #51493d;
+          border: 1px dashed #c7bdad;
+        }
+        .ravel-message-head {
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+          margin-bottom: 6px;
+          opacity: 0.78;
+        }
+        .ravel-message-body {
+          white-space: pre-wrap;
+          line-height: 1.45;
+          font-size: 14px;
+        }
+        .ravel-message-waiting .ravel-message-body {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .ravel-spinner {
+          width: 12px;
+          height: 12px;
+          border-radius: 999px;
+          border: 2px solid rgba(44, 95, 93, 0.25);
+          border-top-color: #2c5f5d;
+          animation: ravel-spin 0.8s linear infinite;
+          display: inline-block;
+        }
+        .ravel-empty-state {
+          padding: 24px 18px;
+          color: #4d463d;
+        }
+        .ravel-empty-title {
+          font-size: 18px;
+          font-weight: 700;
+          margin-bottom: 6px;
+        }
+        .ravel-empty-body {
+          font-size: 14px;
+          line-height: 1.5;
+          max-width: 560px;
+        }
+        .ravel-helper-text {
+          font-size: 12px;
+          color: #6f665b;
+          margin: 4px 0 10px 0;
+        }
+        .ravel-preview-label {
+          font-size: 16px;
+          font-weight: 700;
+          color: #2a2a24;
+          margin-bottom: 6px;
+        }
+        .ravel-preview-note {
+          font-size: 12px;
+          color: #6f665b;
+          margin-bottom: 8px;
+        }
+        .ravel-preview-shell textarea,
+        .ravel-compose-shell textarea {
+          font-family: Consolas, 'Courier New', monospace;
+        }
+        @keyframes ravel-spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      ")),
+      shiny::tags$script(shiny::HTML("
+        Shiny.addCustomMessageHandler('ravel-scroll-chat', function(message) {
+          var el = document.getElementById(message.id);
+          if (!el) {
+            return;
+          }
+          window.setTimeout(function() {
+            el.scrollTop = el.scrollHeight;
+          }, 0);
+        });
+
+        $(document).on('shiny:connected', function() {
+          $('#prompt').attr(
+            'placeholder',
+            'Ask about code, data frames, model output, errors, diagnostics, or Quarto sections...'
+          );
+        });
       "))
     ),
     miniUI::gadgetTitleBar("Ravel"),
     miniUI::miniContentPanel(
-      shiny::fluidRow(
-        shiny::column(
-          width = 4,
-          shiny::div(
-            class = "ravel-panel",
-            shiny::selectInput(
-              "provider",
-              "Provider",
-              choices = stats::setNames(providers$provider, providers$label),
-              selected = settings$default_provider
-            ),
-            shiny::uiOutput("model_ui"),
-            shiny::verbatimTextOutput("auth_status"),
-            shiny::checkboxGroupInput(
-              "context_sources",
-              "Context",
-              choices = c(
-                selection = "selection",
-                file = "file",
-                objects = "objects",
-                console = "console",
-                plot = "plot",
-                session = "session",
-                project = "project"
+      shiny::div(
+        class = "ravel-shell",
+        shiny::fluidRow(
+          shiny::column(
+            width = 4,
+            shiny::div(
+              class = "ravel-panel",
+              shiny::selectInput(
+                "provider",
+                "Provider",
+                choices = stats::setNames(providers$provider, providers$label),
+                selected = settings$default_provider
               ),
-              selected = default_context
-            ),
-            shiny::actionButton("clear_history", "Clear Chat"),
-            shiny::actionButton("refresh_context", "Refresh Context")
-          )
-        ),
-        shiny::column(
-          width = 8,
-          shiny::div(
-            class = "ravel-transcript",
-            shiny::textAreaInput(
-              "transcript",
-              "Conversation",
-              value = "",
-              rows = 18,
-              width = "100%"
+              shiny::uiOutput("model_ui"),
+              shiny::verbatimTextOutput("auth_status"),
+              shiny::checkboxGroupInput(
+                "context_sources",
+                "Context",
+                choices = c(
+                  selection = "selection",
+                  file = "file",
+                  objects = "objects",
+                  console = "console",
+                  plot = "plot",
+                  session = "session",
+                  project = "project"
+                ),
+                selected = default_context
+              ),
+              shiny::actionButton("clear_history", "Clear Chat"),
+              shiny::actionButton("refresh_context", "Refresh Context")
             )
           ),
-          shiny::textAreaInput("prompt", "Ask Ravel", rows = 6, width = "100%"),
-          shiny::fluidRow(
-            shiny::column(width = 4, shiny::actionButton("send", "Send", class = "btn-primary")),
-            shiny::column(width = 4, shiny::actionButton("run_code", "Run Staged Code")),
-            shiny::column(width = 4, shiny::actionButton("insert_code", "Insert Into Editor"))
-          ),
-          shiny::textAreaInput(
-            "code_preview",
-            "Staged Action Preview",
-            value = "",
-            rows = 10,
-            width = "100%"
+          shiny::column(
+            width = 8,
+            shiny::div(
+              class = "ravel-chat-shell",
+              shiny::div(
+                class = "ravel-chat-topline",
+                shiny::div(
+                  shiny::div(class = "ravel-chat-title", "Conversation"),
+                  shiny::div(
+                    class = "ravel-chat-subtitle",
+                    "Messages appear here. Type your next message in the composer below."
+                  )
+                ),
+                shiny::uiOutput("chat_status")
+              ),
+              shiny::div(
+                id = "ravel-chat-scroll",
+                class = "ravel-chat-log",
+                shiny::uiOutput("conversation_ui")
+              )
+            ),
+            shiny::div(
+              class = "ravel-compose-shell",
+              shiny::div(class = "ravel-chat-title", "Message"),
+              shiny::div(
+                class = "ravel-helper-text",
+                "Send one message at a time. Ravel will keep the full conversation context."
+              ),
+              shiny::textAreaInput("prompt", NULL, rows = 5, width = "100%")
+            ),
+            shiny::fluidRow(
+              shiny::column(
+                width = 4,
+                shiny::actionButton(
+                  "send",
+                  "Send To Ravel",
+                  class = "btn-primary"
+                )
+              ),
+              shiny::column(
+                width = 4,
+                shiny::actionButton("run_code", "Run Preview")
+              ),
+              shiny::column(
+                width = 4,
+                shiny::actionButton("insert_code", "Insert Preview")
+              )
+            ),
+            shiny::div(
+              class = "ravel-preview-shell",
+              shiny::div(class = "ravel-preview-label", "Action Preview"),
+              shiny::div(
+                class = "ravel-preview-note",
+                "Generated code or drafted content appears here before you run or insert anything."
+              ),
+              shiny::textAreaInput(
+                "code_preview",
+                NULL,
+                value = "",
+                rows = 10,
+                width = "100%"
+              )
+            )
           )
         )
       )
@@ -131,7 +391,8 @@ ravel_launch_chat_gadget <- function() {
     rv <- shiny::reactiveValues(
       messages = list(),
       pending_action = NULL,
-      last_context = NULL
+      last_context = NULL,
+      is_waiting = FALSE
     )
 
     output$model_ui <- shiny::renderUI({
@@ -154,11 +415,43 @@ ravel_launch_chat_gadget <- function() {
       )
     })
 
+    output$conversation_ui <- shiny::renderUI({
+      ravel_render_messages_ui(rv$messages, waiting = rv$is_waiting)
+    })
+
+    output$chat_status <- shiny::renderUI({
+      if (isTRUE(rv$is_waiting)) {
+        return(shiny::HTML(paste(
+          "<div class='ravel-status-chip ravel-status-chip-waiting'>",
+          "<span class='ravel-spinner' aria-hidden='true'></span>",
+          "Ravel is thinking...",
+          "</div>"
+        )))
+      }
+
+      if (!length(rv$messages)) {
+        return(shiny::HTML(
+          "<div class='ravel-status-chip'>Ready for your first message.</div>"
+        ))
+      }
+
+      if (!is.null(rv$pending_action)) {
+        return(shiny::HTML(
+          "<div class='ravel-status-chip'>A staged action is ready to review.</div>"
+        ))
+      }
+
+      shiny::HTML("<div class='ravel-status-chip'>Ready for the next message.</div>")
+    })
+
     shiny::observe({
-      shiny::updateTextAreaInput(
+      rv$messages
+      rv$is_waiting
+      session$sendCustomMessage("ravel-scroll-chat", list(id = "ravel-chat-scroll"))
+      shiny::updateActionButton(
         session,
-        "transcript",
-        value = ravel_render_messages(rv$messages)
+        "send",
+        label = if (isTRUE(rv$is_waiting)) "Waiting..." else "Send To Ravel"
       )
     })
 
@@ -170,6 +463,7 @@ ravel_launch_chat_gadget <- function() {
     shiny::observeEvent(input$clear_history, {
       rv$messages <- list()
       rv$pending_action <- NULL
+      rv$is_waiting <- FALSE
       state <- ravel_runtime_state()
       state$chat_history <- list()
       ravel_set_runtime_state(state)
@@ -177,41 +471,78 @@ ravel_launch_chat_gadget <- function() {
     })
 
     shiny::observeEvent(input$send, {
+      if (isTRUE(rv$is_waiting)) {
+        shiny::showNotification("Ravel is still working on the previous request.", type = "warning")
+        return()
+      }
+
       req_prompt <- trimws(input$prompt %||% "")
       if (!nzchar(req_prompt)) {
         shiny::showNotification("Enter a prompt first.", type = "warning")
         return()
       }
 
-      context <- rv$last_context %||% ravel_collect_context_from_ui(input$context_sources)
-      rv$last_context <- context
+      history <- rv$messages
+      user_message <- list(role = "user", content = req_prompt)
+      provider_label <- ravel_get_provider(input$provider)$label
+      thinking_id <- "ravel-thinking"
+
+      rv$messages <- c(rv$messages, list(user_message))
+      rv$is_waiting <- TRUE
+      shiny::updateTextAreaInput(session, "prompt", value = "")
+      shiny::showNotification(
+        sprintf("Waiting for %s...", provider_label),
+        id = thinking_id,
+        duration = NULL,
+        closeButton = FALSE,
+        type = "message"
+      )
 
       turn <- tryCatch(
-        ravel_chat_turn(
-          prompt = req_prompt,
-          provider = input$provider,
-          model = input$model,
-          context = context,
-          history = rv$messages
+        shiny::withProgress(
+          message = sprintf("Waiting for %s", provider_label),
+          detail = "Gathering context and sending your request.",
+          value = 0.2,
+          {
+            context <- rv$last_context %||% ravel_collect_context_from_ui(input$context_sources)
+            rv$last_context <- context
+            shiny::incProgress(0.35, detail = "Provider request in flight.")
+            result <- ravel_chat_turn(
+              prompt = req_prompt,
+              provider = input$provider,
+              model = input$model,
+              context = context,
+              history = history
+            )
+            shiny::incProgress(0.45, detail = "Preparing the reply.")
+            result
+          }
         ),
         error = function(e) e
       )
+      rv$is_waiting <- FALSE
+      shiny::removeNotification(id = thinking_id)
 
       if (inherits(turn, "error")) {
+        rv$messages <- c(
+          rv$messages,
+          list(list(
+            role = "system",
+            content = paste("Request failed:\n", conditionMessage(turn))
+          ))
+        )
         shiny::showNotification(conditionMessage(turn), type = "error", duration = NULL)
         return()
       }
 
-      rv$messages <- c(
-        rv$messages,
-        list(list(role = "user", content = req_prompt), turn$message)
-      )
-      shiny::updateTextAreaInput(session, "prompt", value = "")
+      rv$messages <- c(rv$messages, list(turn$message))
 
       if (length(turn$actions)) {
         rv$pending_action <- turn$actions[[1]]
         preview_text <- turn$actions[[1]]$payload$code %||% turn$actions[[1]]$payload$text %||% ""
         shiny::updateTextAreaInput(session, "code_preview", value = preview_text)
+      } else {
+        rv$pending_action <- NULL
       }
     })
 
