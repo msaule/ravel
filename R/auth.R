@@ -274,7 +274,7 @@ ravel_openai_auth_mode <- function(settings, has_api_key, has_codex) {
 ravel_copilot_binary <- function() {
   path <- Sys.which("copilot")
   if (nzchar(path)) {
-    return(path)
+    return(normalizePath(path, winslash = "/", mustWork = FALSE))
   }
 
   roots <- c(
@@ -294,11 +294,22 @@ ravel_copilot_binary <- function() {
       ignore.case = TRUE
     )
     if (length(hits)) {
-      return(hits[[1]])
+      return(normalizePath(hits[[1]], winslash = "/", mustWork = FALSE))
     }
   }
 
   NULL
+}
+
+ravel_copilot_login_command <- function() {
+  binary <- ravel_copilot_binary()
+  if (is.null(binary)) {
+    return("copilot login")
+  }
+  if (ravel_command_available("copilot")) {
+    return("copilot login")
+  }
+  paste(shQuote(binary), "login")
 }
 
 ravel_gh_auth_token <- function() {
@@ -328,6 +339,7 @@ ravel_copilot_auth_status <- function() {
   if (is.null(binary)) {
     return(list(
       configured = FALSE,
+      available = FALSE,
       mode = "oauth_device_flow",
       detail = "Copilot CLI is not installed. Install the official `copilot` CLI first."
     ))
@@ -337,23 +349,28 @@ ravel_copilot_auth_status <- function() {
   if (!is.null(token)) {
     return(list(
       configured = TRUE,
+      available = TRUE,
       mode = "gh_cli_oauth_token",
       detail = "Copilot CLI is installed and a supported GitHub token is available."
     ))
   }
 
   list(
-    configured = TRUE,
+    configured = FALSE,
+    available = TRUE,
     mode = "oauth_device_flow",
     detail = paste(
-      "Copilot CLI is installed. Run `copilot login` to start the",
-      "official OAuth device flow."
+      "Copilot CLI is installed, but stored login state cannot be verified",
+      "until a request is made. Run",
+      ravel_copilot_login_command(),
+      "for the official OAuth device flow, or provide GH_TOKEN."
     )
   )
 }
 
 ravel_openai_auth_status <- function() {
   api_key <- ravel_get_secret("openai", "api_key")
+  codex_binary <- ravel_codex_binary()
   codex <- ravel_codex_cli_logged_in()
   mode <- ravel_openai_auth_mode(
     settings = ravel_read_settings(),
@@ -364,24 +381,40 @@ ravel_openai_auth_status <- function() {
   if (!is.null(api_key) && codex) {
     return(list(
       configured = TRUE,
+      available = TRUE,
       mode = mode,
       detail = "OpenAI API key and Codex CLI login are both configured."
     ))
   }
   if (!is.null(api_key)) {
-    return(list(configured = TRUE, mode = "api_key", detail = "OpenAI API key is configured."))
+    return(list(
+      configured = TRUE,
+      available = TRUE,
+      mode = "api_key",
+      detail = "OpenAI API key is configured."
+    ))
   }
   if (codex) {
     return(list(
       configured = TRUE,
+      available = TRUE,
       mode = "codex_cli",
       detail = "Codex CLI is available for official sign-in style workflows."
     ))
   }
   list(
     configured = FALSE,
+    available = !is.null(codex_binary),
     mode = "api_key",
-    detail = "Configure OPENAI_API_KEY or install the Codex CLI for login-first workflows."
+    detail = if (!is.null(codex_binary)) {
+      paste(
+        "Codex CLI is installed but not logged in. Run",
+        ravel_codex_login_command(),
+        "or configure OPENAI_API_KEY."
+      )
+    } else {
+      "Configure OPENAI_API_KEY or install the Codex CLI for login-first workflows."
+    }
   )
 }
 
@@ -395,6 +428,7 @@ ravel_api_key_auth_status <- function(provider) {
   )
   list(
     configured = configured,
+    available = TRUE,
     mode = "api_key",
     detail = if (configured) paste(label, "is configured.") else paste(label, "is not configured.")
   )
@@ -490,7 +524,7 @@ ravel_login <- function(provider = c("openai", "copilot", "gemini", "anthropic")
       provider = provider,
       mode = mode %||% "oauth_device_flow",
       supported = TRUE,
-      command = "copilot login",
+      command = ravel_copilot_login_command(),
       detail = paste(
         "Use the official Copilot CLI login flow, or provide a supported token",
         "through COPILOT_GITHUB_TOKEN, GH_TOKEN, or GITHUB_TOKEN."

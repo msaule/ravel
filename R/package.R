@@ -7,6 +7,17 @@
 
 ravel_state_env <- new.env(parent = emptyenv())
 
+.onAttach <- function(libname, pkgname) {
+  if (!interactive()) {
+    return(invisible(NULL))
+  }
+
+  packageStartupMessage(
+    "Ravel loaded. Launch chat with ravel::ravel_chat_addin() or run ",
+    "ravel::ravel_setup_addin() for first-run setup."
+  )
+}
+
 `%||%` <- function(x, y) {
   if (is.null(x) || identical(x, "")) {
     return(y)
@@ -116,7 +127,7 @@ ravel_gadget_viewer <- function(kind = c("chat", "settings")) {
     if (identical(kind, "chat")) {
       return(shiny::paneViewer(minHeight = 900))
     }
-    return(shiny::dialogViewer("Ravel Settings", width = 700, height = 700))
+    return(shiny::dialogViewer("Ravel Setup", width = 980, height = 860))
   }
 
   shiny::browserViewer()

@@ -23,6 +23,7 @@ Files:
 Responsibilities:
 
 - launch the RStudio gadget
+- provide a first-run setup assistant and live readiness checks
 - let users choose provider and model
 - expose context toggles
 - display chat history and staged actions
@@ -54,6 +55,7 @@ Responsibilities:
 - resolve secrets from environment, optional keyring, or session cache
 - report supported auth modes per provider
 - expose honest login/logout flows
+- surface doctor/setup information and official docs or key-console links
 
 ### 4. Context layer
 

@@ -287,14 +287,132 @@ ravel_launch_settings_gadget <- function() {
   providers <- ravel_list_providers()
 
   ui <- miniUI::miniPage(
-    miniUI::gadgetTitleBar("Ravel Settings"),
+    miniUI::gadgetTitleBar("Ravel Setup"),
     miniUI::miniContentPanel(
-      shiny::selectInput(
-        "default_provider",
-        "Default provider",
-        choices = stats::setNames(providers$provider, providers$label),
-        selected = settings$default_provider
-      ),
+      shiny::tabsetPanel(
+        id = "setup_tabs",
+        shiny::tabPanel(
+          "Overview",
+          shiny::p(
+            paste(
+              "Ravel should be easy to install, easy to trust, and easy to recover",
+              "when setup goes wrong."
+            )
+          ),
+          shiny::fluidRow(
+            shiny::column(
+              width = 4,
+              shiny::actionButton("refresh_status", "Refresh Checks")
+            ),
+            shiny::column(
+              width = 4,
+              shiny::actionButton("open_chat", "Open Chat", class = "btn-primary")
+            )
+          ),
+          shiny::tags$br(),
+          shiny::verbatimTextOutput("setup_summary"),
+          shiny::tableOutput("doctor_table")
+        ),
+        shiny::tabPanel(
+          "Provider Setup",
+          shiny::selectInput(
+            "provider",
+            "Provider",
+            choices = stats::setNames(providers$provider, providers$label),
+            selected = settings$default_provider
+          ),
+          shiny::uiOutput("openai_mode_ui"),
+          shiny::verbatimTextOutput("provider_status"),
+          shiny::verbatimTextOutput("provider_actions"),
+          shiny::uiOutput("credential_inputs"),
+          shiny::checkboxInput(
+            "persist",
+            "Persist secrets with keyring when available",
+            value = TRUE
+          ),
+          shiny::fluidRow(
+            shiny::column(
+              width = 4,
+              shiny::actionButton("save_auth", "Save Credentials", class = "btn-primary")
+            ),
+            shiny::column(width = 4, shiny::actionButton("launch_login", "Launch Sign-In")),
+            shiny::column(width = 4, shiny::actionButton("verify_provider", "Verify Connection"))
+          ),
+          shiny::tags$br(),
+          shiny::fluidRow(
+            shiny::column(width = 4, shiny::actionButton("open_docs", "Open Docs")),
+            shiny::column(width = 4, shiny::actionButton("open_keys", "Open Key Page")),
+            shiny::column(width = 4, shiny::actionButton("clear_auth", "Clear Stored Auth"))
+          )
+        )
+      )
+    )
+  )
+
+  server <- function(input, output, session) {
+    refresh_counter <- shiny::reactiveVal(0L)
+
+    refresh_status <- function() {
+      refresh_counter(refresh_counter() + 1L)
+    }
+
+    provider_name <- shiny::reactive({
+      input$provider %||% settings$default_provider %||% "openai"
+    })
+
+    doctor <- shiny::reactive({
+      refresh_counter()
+      ravel_doctor()
+    })
+
+    provider_info <- shiny::reactive({
+      refresh_counter()
+      ravel_provider_setup_info(provider_name())
+    })
+
+    output$setup_summary <- shiny::renderText({
+      checks <- doctor()
+      ready_providers <- vapply(ravel_ready_providers(), `[[`, character(1), "provider")
+
+      if (length(ready_providers)) {
+        paste(
+          sprintf("Ready providers: %s.", paste(ready_providers, collapse = ", ")),
+          "",
+          "Open chat now, or keep configuring more providers while you are here.",
+          "",
+          sprintf("%d of %d checks are currently passing.", sum(checks$ok), nrow(checks)),
+          sep = "\n"
+        )
+      } else {
+        paste(
+          "No provider is fully ready yet.",
+          "",
+          "Use the Provider Setup tab to sign in with OpenAI or Copilot,",
+          "or save an API key for Gemini or Anthropic.",
+          "",
+          sprintf("%d of %d checks are currently passing.", sum(checks$ok), nrow(checks)),
+          sep = "\n"
+        )
+      }
+    })
+
+    output$doctor_table <- shiny::renderTable({
+      checks <- doctor()
+      data.frame(
+        Check = checks$check,
+        Ready = ifelse(checks$ok, "yes", "no"),
+        Detail = checks$detail,
+        Fix = checks$fix,
+        check.names = FALSE,
+        stringsAsFactors = FALSE
+      )
+    }, striped = TRUE, bordered = TRUE, spacing = "xs")
+
+    output$openai_mode_ui <- shiny::renderUI({
+      if (!identical(provider_name(), "openai")) {
+        return(NULL)
+      }
+
       shiny::selectInput(
         "openai_auth_mode",
         "OpenAI auth mode",
@@ -303,69 +421,175 @@ ravel_launch_settings_gadget <- function() {
           api_key = "api_key",
           codex_cli = "codex_cli"
         ),
-        selected = settings$provider_auth_modes$openai %||% "auto"
-      ),
-      shiny::textInput("openai_key", "OpenAI API key", value = ""),
-      shiny::textInput("gemini_key", "Gemini API key", value = ""),
-      shiny::textInput("gemini_token", "Gemini bearer token", value = ""),
-      shiny::textInput("anthropic_key", "Anthropic API key", value = ""),
-      shiny::checkboxInput("persist", "Persist secrets with keyring when available", value = TRUE),
-      shiny::selectInput(
-        "clear_provider",
-        "Clear stored auth for provider",
-        choices = providers$provider,
-        selected = "openai"
-      ),
-      shiny::fluidRow(
-        shiny::column(
-          width = 6,
-          shiny::actionButton("save", "Save Settings", class = "btn-primary")
-        ),
-        shiny::column(width = 6, shiny::actionButton("clear_auth", "Clear Selected Auth"))
-      ),
-      shiny::verbatimTextOutput("settings_status")
-    )
-  )
-
-  server <- function(input, output, session) {
-    output$settings_status <- shiny::renderText({
-      statuses <- lapply(c("openai", "copilot", "gemini", "anthropic"), ravel_auth_status)
-      paste(vapply(statuses, function(x) {
-        sprintf(
-          "%s: %s (%s)",
-          x$provider,
-          x$detail,
-          if (x$configured) "configured" else "not configured"
-        )
-      }, character(1)), collapse = "\n")
+        selected = ravel_read_settings()$provider_auth_modes$openai %||% "auto"
+      )
     })
 
-    shiny::observeEvent(input$save, {
-      ravel_set_setting("default_provider", input$default_provider)
-      modes <- ravel_get_setting("provider_auth_modes", default = list())
-      modes$openai <- input$openai_auth_mode
-      ravel_set_setting("provider_auth_modes", modes)
-      if (nzchar(trimws(input$openai_key))) {
-        ravel_set_api_key("openai", input$openai_key, persist = input$persist)
+    output$provider_status <- shiny::renderText({
+      info <- provider_info()
+      status <- info$auth
+      paste(
+        sprintf("Provider: %s", info$label),
+        sprintf("Configured: %s", if (isTRUE(status$configured)) "yes" else "no"),
+        sprintf("Available locally: %s", if (isTRUE(status$available)) "yes" else "no"),
+        sprintf("Auth mode: %s", status$mode),
+        status$detail,
+        sep = "\n"
+      )
+    })
+
+    output$provider_actions <- shiny::renderText({
+      info <- provider_info()
+      caps <- ravel_provider_capabilities(provider_name())
+      lines <- c(
+        sprintf("Supported auth modes: %s", paste(caps$auth_modes, collapse = ", ")),
+        sprintf("Default model: %s", caps$default_model),
+        if (!is.null(info$login$command)) sprintf("Login command: %s", info$login$command),
+        if (!is.null(info$binary)) sprintf("Detected CLI: %s", info$binary),
+        if (!is.null(info$docs_url)) sprintf("Docs: %s", info$docs_url),
+        if (!is.null(info$api_keys_url)) sprintf("API keys / console: %s", info$api_keys_url)
+      )
+      paste(lines, collapse = "\n")
+    })
+
+    output$credential_inputs <- shiny::renderUI({
+      switch(
+        provider_name(),
+        openai = shiny::tagList(
+          shiny::passwordInput("openai_key", "OpenAI API key", value = ""),
+          shiny::helpText(
+            "Leave this blank if you prefer the official Codex CLI sign-in path.",
+            paste(
+              "The saved auth mode controls whether Ravel prefers API requests,",
+              "Codex CLI, or auto fallback."
+            )
+          )
+        ),
+        gemini = shiny::tagList(
+          shiny::passwordInput("gemini_key", "Gemini API key", value = ""),
+          shiny::passwordInput("gemini_token", "Gemini bearer token", value = ""),
+          shiny::helpText(
+            "Use the API key for the simplest setup. Bearer token support is reserved",
+            "for official OAuth-style flows."
+          )
+        ),
+        anthropic = shiny::tagList(
+          shiny::passwordInput("anthropic_key", "Anthropic API key", value = ""),
+          shiny::helpText("Anthropic support is API-key only. Consumer Claude login is not used.")
+        ),
+        copilot = shiny::tagList(
+          shiny::helpText(
+            "Copilot uses the official Copilot CLI login flow or a supported GitHub token.",
+            "No separate API key field is required here."
+          )
+        )
+      )
+    })
+
+    shiny::observeEvent(input$refresh_status, {
+      refresh_status()
+      shiny::showNotification("Ravel readiness checks refreshed.", type = "message")
+    })
+
+    shiny::observeEvent(input$save_auth, {
+      selected_provider <- provider_name()
+      ravel_set_setting("default_provider", selected_provider)
+
+      if (identical(selected_provider, "openai")) {
+        modes <- ravel_get_setting("provider_auth_modes", default = list())
+        modes$openai <- input$openai_auth_mode %||% "auto"
+        ravel_set_setting("provider_auth_modes", modes)
       }
-      if (nzchar(trimws(input$gemini_key))) {
-        ravel_set_api_key("gemini", input$gemini_key, persist = input$persist)
+
+      if (nzchar(trimws(input$openai_key %||% ""))) {
+        ravel_set_api_key("openai", trimws(input$openai_key), persist = input$persist)
       }
-      if (nzchar(trimws(input$gemini_token))) {
-        ravel_set_bearer_token("gemini", input$gemini_token, persist = input$persist)
+      if (nzchar(trimws(input$gemini_key %||% ""))) {
+        ravel_set_api_key("gemini", trimws(input$gemini_key), persist = input$persist)
       }
-      if (nzchar(trimws(input$anthropic_key))) {
-        ravel_set_api_key("anthropic", input$anthropic_key, persist = input$persist)
+      if (nzchar(trimws(input$gemini_token %||% ""))) {
+        ravel_set_bearer_token("gemini", trimws(input$gemini_token), persist = input$persist)
       }
-      shiny::showNotification("Settings saved.", type = "message")
+      if (nzchar(trimws(input$anthropic_key %||% ""))) {
+        ravel_set_api_key("anthropic", trimws(input$anthropic_key), persist = input$persist)
+      }
+
+      refresh_status()
+      shiny::showNotification("Ravel setup updated.", type = "message")
+    })
+
+    shiny::observeEvent(input$launch_login, {
+      result <- tryCatch(
+        {
+          ravel_launch_login(provider_name(), mode = input$openai_auth_mode %||% NULL)
+          NULL
+        },
+        error = function(e) e
+      )
+
+      if (inherits(result, "error")) {
+        shiny::showNotification(conditionMessage(result), type = "error", duration = NULL)
+      } else {
+        shiny::showNotification(
+          sprintf("Launched the official %s sign-in flow.", provider_info()$label),
+          type = "message"
+        )
+      }
+    })
+
+    shiny::observeEvent(input$verify_provider, {
+      verification <- ravel_verify_provider(provider_name())
+      refresh_status()
+
+      if (isTRUE(verification$ok)) {
+        shiny::showNotification(
+          sprintf("%s verified successfully.", provider_info()$label),
+          type = "message"
+        )
+      } else {
+        shiny::showNotification(
+          paste("Provider verification failed:", verification$content),
+          type = "error",
+          duration = NULL
+        )
+      }
+    })
+
+    shiny::observeEvent(input$open_docs, {
+      ravel_open_provider_page(provider_name(), "docs")
+    })
+
+    shiny::observeEvent(input$open_keys, {
+      result <- tryCatch(
+        {
+          ravel_open_provider_page(provider_name(), "api_keys")
+          NULL
+        },
+        error = function(e) e
+      )
+      if (inherits(result, "error")) {
+        shiny::showNotification(conditionMessage(result), type = "error", duration = NULL)
+      }
     })
 
     shiny::observeEvent(input$clear_auth, {
-      ravel_logout(input$clear_provider)
+      ravel_logout(provider_name())
+      refresh_status()
       shiny::showNotification(
-        sprintf("Cleared stored auth for %s.", input$clear_provider),
+        sprintf("Cleared stored auth for %s.", provider_name()),
         type = "message"
       )
+    })
+
+    shiny::observeEvent(input$open_chat, {
+      if (!ravel_has_ready_provider()) {
+        shiny::showNotification(
+          "Finish at least one provider setup path before opening chat.",
+          type = "warning"
+        )
+        return()
+      }
+      shiny::stopApp("chat")
     })
 
     shiny::observeEvent(input$done, {
@@ -377,5 +601,9 @@ ravel_launch_settings_gadget <- function() {
     })
   }
 
-  shiny::runGadget(ui, server, viewer = ravel_gadget_viewer("settings"))
+  result <- shiny::runGadget(ui, server, viewer = ravel_gadget_viewer("settings"))
+  if (identical(result, "chat")) {
+    return(invisible(ravel_launch_chat_gadget()))
+  }
+  invisible(result)
 }

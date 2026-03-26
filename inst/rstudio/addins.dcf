@@ -7,3 +7,8 @@ Name: Ravel Settings
 Description: Launch the Ravel settings gadget.
 Binding: ravel_settings_addin
 Interactive: true
+
+Name: Ravel Setup
+Description: Launch the guided Ravel setup assistant.
+Binding: ravel_setup_addin
+Interactive: true

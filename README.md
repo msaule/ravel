@@ -55,46 +55,74 @@ If a provider is unavailable or only partially supported, Ravel surfaces that cl
 
 ## Installation
 
-From the repository root in R:
+For regular users, the easiest install path is one command:
 
 ```r
-install.packages(c(
-  "cli",
-  "httr2",
-  "jsonlite",
-  "miniUI",
-  "rstudioapi",
-  "shiny",
-  "tibble",
-  "vctrs",
-  "digest",
-  "xml2",
-  "curl",
-  "testthat"
-))
-
-# Optional but recommended for secure key storage
-install.packages("keyring")
-
-devtools::install(".")
+install.packages("pak")
+pak::pak("msaule/ravel")
 ```
 
-If you are developing from source on Windows and want to run full package checks,
-install Rtools and ensure its toolchain is available on `PATH`.
+This installs Ravel and its package dependencies without requiring you to
+manually list them one by one.
 
-## Launching the addin
+Optional but recommended:
+
+```r
+install.packages("keyring")
+```
+
+`keyring` lets Ravel store API keys more securely than plain session memory.
+
+### Development installs
+
+If you are iterating on the repository locally, prefer:
+
+```r
+devtools::load_all(".")
+```
+
+Use `devtools::install(".")` only when you specifically need the installed
+package. Reinstalling over a loaded package can leave behind a stale or corrupt
+lazy-load database in a long-lived R session.
+
+If you ever hit an error like `lazy-load database ... is corrupt`:
+
+1. Restart R.
+2. Remove the stale install:
+   ```r
+   remove.packages("ravel")
+   ```
+3. Reinstall cleanly:
+   ```r
+   pak::pak("msaule/ravel")
+   ```
+
+If you are developing from source on Windows and want to run full package
+checks, install Rtools and ensure its toolchain is available on `PATH`.
+
+## First-run setup
 
 After installing:
+
+```r
+ravel::ravel_setup_addin()
+```
+
+The setup assistant runs inside RStudio and helps you:
+
+- check whether the Viewer pane, CLI tools, and secure secret storage are available
+- launch official login flows for OpenAI Codex CLI and GitHub Copilot CLI
+- save API keys for OpenAI, Gemini, and Anthropic
+- open the official docs or key-management pages for each provider
+- verify a provider with a tiny live prompt before you open chat
+
+If at least one provider is ready, open chat with:
 
 ```r
 ravel::ravel_chat_addin()
 ```
 
-You can also launch the settings gadget with:
-
-```r
-ravel::ravel_settings_addin()
-```
+You can also launch the setup panel from the RStudio Addins menu.
 
 ## What the addin can do
 

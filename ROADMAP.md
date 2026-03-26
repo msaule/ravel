@@ -34,6 +34,7 @@
 
 ## Phase 5: Posit-native polish
 
+- Guided first-run setup assistant with live provider verification
 - Better document insertion and patch previews in RStudio
 - Settings UX for auth and provider defaults
 - Conversation/session persistence across projects
