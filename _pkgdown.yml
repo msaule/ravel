@@ -1,13 +1,13 @@
 template:
   bootstrap: 5
   bslib:
-    bootswatch: flatly
+    bootswatch: litera
 
 url: https://msaule.github.io/ravel
 
 home:
   title: Ravel
-  description: RStudio-native AI copilot for R analysis workflows.
+  description: R-first AI copilot for RStudio and Posit workflows.
 
 navbar:
   structure:

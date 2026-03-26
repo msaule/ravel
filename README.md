@@ -1,20 +1,25 @@
-<p align="center">
-  <img src="man/figures/ravel-banner.svg" alt="Ravel banner" width="100%" />
+<p align="center" class="ravel-hero-image">
+  <img src="man/figures/ravel-banner.svg" alt="Abstract woven banner for Ravel" width="100%" />
 </p>
 
-# Ravel
+<h1 align="center">Ravel</h1>
 
-[![R-CMD-check](https://github.com/msaule/ravel/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/msaule/ravel/actions/workflows/R-CMD-check.yaml)
-[![Release](https://img.shields.io/github/v/release/msaule/ravel?display_name=tag)](https://github.com/msaule/ravel/releases)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.txt)
-[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://github.com/msaule/ravel)
-[![Docs](https://img.shields.io/badge/docs-pkgdown-2c5f5d.svg)](https://msaule.github.io/ravel/)
+<p align="center" class="ravel-tagline">
+  <strong>R-first AI copilot for RStudio and Posit workflows.</strong><br />
+  Context-aware code help, model interpretation, safe execution, and Quarto drafting.
+</p>
 
-Ravel is an RStudio/Posit-native coding and analytics copilot for R users.
+<p align="center" class="ravel-badges">
+  <a href="https://github.com/msaule/ravel/actions/workflows/R-CMD-check.yaml"><img src="https://github.com/msaule/ravel/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check" /></a>
+  <a href="https://github.com/msaule/ravel/releases"><img src="https://img.shields.io/github/v/release/msaule/ravel?display_name=tag" alt="Release" /></a>
+  <a href="https://github.com/msaule/ravel/blob/main/LICENSE.txt"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License: MIT" /></a>
+  <a href="https://github.com/msaule/ravel"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental" /></a>
+  <a href="https://msaule.github.io/ravel/"><img src="https://img.shields.io/badge/docs-pkgdown-2c5f5d.svg" alt="Docs" /></a>
+</p>
 
-It is designed for code generation, object-aware analysis, statistical interpretation, safe execution, and reproducible authoring inside RStudio workflows. The package is intentionally R-first: it understands scripts, selections, data frames, formulas, model objects, console state captured through Ravel actions, and Quarto/R Markdown authoring tasks.
+Ravel is not just chat inside an IDE. It is designed to behave like an analysis copilot for R users: it understands the active script, selected code, loaded objects, model outputs, git changes, and reproducible reporting workflows so it can help with real RStudio work instead of acting like a generic web chatbot.
 
-## Quick start
+## Install now
 
 ```r
 if (!requireNamespace("pak", quietly = TRUE)) install.packages("pak")
@@ -23,37 +28,29 @@ library(ravel)
 ravel::ravel_setup_addin()
 ```
 
-## Why Ravel
+> GitHub install works today. A standard `install.packages("ravel")` flow will be available once CRAN publishes the package.
 
-Most IDE assistants for R focus on inline completion or generic chat. Ravel is built to feel closer to an analysis agent:
+## Why it feels different
 
-- It gathers project and session context before answering.
-- It summarizes loaded objects instead of treating R like plain text.
-- It specializes in `lm`, `glm`, formulas, diagnostics, and interpretation.
-- It previews code and file edits before running them.
-- It logs actions for auditability.
-- It supports multiple providers through a common interface.
+- **Context-aware by default.** Ravel gathers the active editor, selected code, workspace objects, console state captured through Ravel actions, project files, and recent git diffs before it responds.
+- **Built for statistical work.** It explains `lm()` and `glm()` results, coefficients, interactions, fit diagnostics, and common modeling pitfalls in plain English.
+- **Safe when it acts.** Generated code is previewed, file edits are staged, and actions are logged instead of silently executed.
+- **Designed for RStudio.** The setup flow, chat UI, and action workflow live inside RStudio addins rather than treating R as a thin wrapper around a generic chat window.
+- **Multi-provider without pretending.** Ravel supports official APIs and official CLIs only, with clear messaging when a provider or auth path is unavailable.
 
-## MVP status
+## What works today
 
-The repository currently includes:
+- RStudio addins for setup and chat
+- Provider adapters for OpenAI, GitHub Copilot CLI, Gemini, and Anthropic
+- Active-editor, selection, object, session, console, plot, project, and git-aware context
+- Statistical helpers for model summaries, coefficients, diagnostics, and Quarto drafting
+- Code preview, approval, execution, file staging, and action history logging
 
-- An installable R package skeleton with exports, tests, CI, and vignettes
-- An RStudio addin and Shiny gadget chat UI
-- Provider abstractions for OpenAI, GitHub Copilot CLI, Gemini, and Anthropic
-- Auth and settings helpers with optional secure secret storage via `keyring`
-- Context gathering for active document, selection, workspace objects, project files, session info, plot metadata, and Ravel-captured console output
-- Git-aware context for workspace diffs, branch state, and focused file changes
-- Safe code preview / approval helpers for running code or applying file edits
-- Statistical helpers for model summarization, coefficient interpretation, and diagnostic suggestions
-- Quarto drafting helpers for results, methods, and diagnostics sections
-- Action and conversation history logging
+## Provider support
 
-## Honest provider support
+Ravel is explicit about what is supported today and what is still constrained by official provider boundaries.
 
-Ravel is explicit about what is supported today, what is experimental, and what is not available through official APIs.
-
-| Provider | Status in MVP | Auth modes in package | Notes |
+| Provider | Status | Auth paths in Ravel | Notes |
 | --- | --- | --- | --- |
 | OpenAI API | Implemented | API key | Implemented against OpenAI HTTP APIs. |
 | OpenAI Codex / ChatGPT | Working | Codex CLI sign-in, API key fallback | Ravel can use the official Codex CLI as a login-first OpenAI path, and can fall back to it automatically when the API path is rate-limited in `auto` mode. |
@@ -61,151 +58,41 @@ Ravel is explicit about what is supported today, what is experimental, and what 
 | Gemini | Implemented for API key, OAuth-ready abstraction | API key, bearer token/OAuth-style token slot | API-key flow is implemented. OAuth is represented in the auth abstraction so the provider boundary stays clean. |
 | Anthropic | Implemented | API key | Official API-key auth only. No consumer-login mode is claimed. |
 
-## Auth policy
-
-Ravel follows official patterns:
-
-- OpenAI API uses bearer API keys.
-- OpenAI login-first support uses the official Codex CLI sign-in flow, not a pretend ChatGPT API.
-- GitHub Copilot support uses the official Copilot CLI and supported GitHub OAuth tokens.
-- Gemini supports API-key mode and a bearer-token auth slot for official OAuth-based flows.
-- Anthropic requires API keys.
-
-If a provider is unavailable or only partially supported, Ravel surfaces that clearly instead of silently falling back to an unofficial path.
-
-## Installation
-
-For regular users, the easiest install path today is:
-
-```r
-if (!requireNamespace("pak", quietly = TRUE)) install.packages("pak")
-pak::pak("msaule/ravel")
-```
-
-This installs Ravel and its package dependencies without requiring you to
-manually list them one by one.
-
-If you prefer a GitHub release artifact instead of `pak`, tagged releases now
-also ship a source tarball on the Releases page.
-
-Optional but recommended:
-
-```r
-install.packages("keyring")
-```
-
-`keyring` lets Ravel store API keys more securely than plain session memory.
-
-### Standard `install.packages("ravel")`
-
-Not yet, at least not from the default CRAN mirror.
-
-For a plain:
-
-```r
-install.packages("ravel")
-```
-
-to work for most users without extra repository configuration, Ravel needs to
-be published to CRAN.
-
-For a near-term middle ground, Ravel can also be published through
-`r-universe`, which gives users a normal `install.packages()` flow with one
-extra repository entry:
-
-```r
-install.packages(
-  "ravel",
-  repos = c("https://msaule.r-universe.dev", "https://cloud.r-project.org")
-)
-```
-
-The current easiest path remains `pak::pak("msaule/ravel")` from GitHub.
-
-### Development installs
-
-If you are iterating on the repository locally, prefer:
-
-```r
-devtools::load_all(".")
-```
-
-Use `devtools::install(".")` only when you specifically need the installed
-package. Reinstalling over a loaded package can leave behind a stale or corrupt
-lazy-load database in a long-lived R session.
-
-If you ever hit an error like `lazy-load database ... is corrupt`:
-
-1. Restart R.
-2. Remove the stale install:
-   ```r
-   remove.packages("ravel")
-   ```
-3. Reinstall cleanly:
-   ```r
-   pak::pak("msaule/ravel")
-   ```
-
-If you are developing from source on Windows and want to run full package
-checks, install Rtools and ensure its toolchain is available on `PATH`.
-
 ## First-run setup
 
-After installing:
+1. Install and load `ravel`.
+2. Run the setup assistant:
+   ```r
+   ravel::ravel_setup_addin()
+   ```
+3. Sign in or save a key for at least one provider.
+4. Verify the provider from the setup panel.
+5. Open chat:
+   ```r
+   ravel::ravel_chat_addin()
+   ```
 
-```r
-ravel::ravel_setup_addin()
-```
-
-The setup assistant runs inside RStudio and helps you:
-
-- check whether the Viewer pane, CLI tools, and secure secret storage are available
-- launch official login flows for OpenAI Codex CLI and GitHub Copilot CLI
-- save API keys for OpenAI, Gemini, and Anthropic
-- open the official docs or key-management pages for each provider
-- verify a provider with a tiny live prompt before you open chat
-
-If at least one provider is ready, open chat with:
-
-```r
-ravel::ravel_chat_addin()
-```
-
-You can also launch the setup panel from the RStudio Addins menu.
-
-## What the addin can do
+## What you can ask Ravel to do
 
 - Ask questions about selected R code
-- Use recent git diffs and branch state as part of project context
-- Explain model summaries and coefficients
+- Explain an error, warning, or traceback
+- Interpret model summaries, coefficients, and interactions
+- Suggest diagnostics and next modeling steps
 - Summarize loaded data frames and model objects
-- Draft Quarto sections from live analysis context
-- Propose code blocks for execution
-- Insert generated code into the active RStudio document
-- Preview and approve console execution before anything runs
+- Draft Quarto results, methods, and diagnostics sections
+- Refactor tidyverse code to base R or the reverse
+- Propose code and stage it before execution or insertion
 
-## Statistical differentiation
+## Safety and trust
 
-Ravel is tuned for analysis workflows, not just chat:
+- No silent code execution by default
+- No silent file edits by default
+- Explicit previews and approvals
+- Structured history for actions and conversations
+- Honest provider and auth messaging
+- Statistical caveats when assumptions or limitations are visible
 
-- `lm` / `glm` explanation
-- coefficient and interaction interpretation
-- common diagnostic suggestions
-- residual and fit discussion
-- modeling tradeoff prompts
-- tidyverse/base-R translation help
-- Quarto-ready prose from model summaries
-
-## Safety model
-
-Ravel does not silently execute generated code by default.
-
-- Proposed code is previewed before execution.
-- File edits are staged as actions.
-- History is written to a persistent log.
-- Statistical answers include warnings when assumptions or limitations are visible from the context.
-
-## Repository guide
+## Documentation and project guide
 
 - Package website: <https://msaule.github.io/ravel/>
 - [ARCHITECTURE.md](ARCHITECTURE.md) explains the layers and execution model.
@@ -214,6 +101,17 @@ Ravel does not silently execute generated code by default.
 - [RELEASING.md](RELEASING.md) captures the CRAN and R-universe release path.
 - [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) describes community expectations.
 - [AGENTS.md](AGENTS.md) describes collaboration conventions for contributors and coding agents.
+
+## For contributors
+
+If you are developing on the repository locally, prefer:
+
+```r
+devtools::load_all(".")
+```
+
+Use `devtools::install(".")` only when you specifically need the installed
+package. Full release and submission details live in [RELEASING.md](RELEASING.md).
 
 ## References
 

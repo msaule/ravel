@@ -1,6 +1,7 @@
 (^|[\\/])\.github($|[\\/])
 (^|[\\/])\.lintr$
 ^LICENSE\.txt$
+(^|[\\/])pkgdown($|[\\/])
 (^|[\\/])README\.md$
 (^|[\\/])AGENTS\.md$
 (^|[\\/])ROADMAP\.md$
