@@ -7,6 +7,9 @@ ravel_default_settings <- function() {
       anthropic = "claude-sonnet-4-20250514",
       copilot = "copilot-cli"
     ),
+    provider_auth_modes = list(
+      openai = "auto"
+    ),
     context_defaults = list(
       selection = TRUE,
       file = TRUE,
@@ -200,27 +203,133 @@ ravel_command_available <- function(command) {
   nzchar(Sys.which(command))
 }
 
-ravel_copilot_auth_status <- function() {
-  if (!ravel_command_available("gh")) {
-    return(list(
-      configured = FALSE,
-      mode = "gh_cli",
-      detail = "GitHub CLI (`gh`) is not installed."
-    ))
+ravel_codex_cli_logged_in <- function() {
+  if (!ravel_command_available("codex")) {
+    return(FALSE)
   }
 
   output <- tryCatch(
-    system2("gh", c("auth", "status"), stdout = TRUE, stderr = TRUE),
+    system2("codex", c("login", "status"), stdout = TRUE, stderr = TRUE),
     error = function(e) character()
   )
-  ok <- any(grepl("Logged in to github.com", output, fixed = TRUE))
-  detail <- if (ok) "GitHub CLI is authenticated." else ravel_trim_text(output, 500L)
-  list(configured = ok, mode = "gh_cli", detail = detail)
+
+  any(grepl("Logged in using", output, fixed = TRUE))
+}
+
+ravel_openai_auth_mode <- function(settings, has_api_key, has_codex) {
+  preferred <- settings$provider_auth_modes$openai %||% "auto"
+  if (identical(preferred, "api_key")) {
+    return("api_key")
+  }
+  if (identical(preferred, "codex_cli")) {
+    return("codex_cli")
+  }
+  if (has_api_key) {
+    return("api_key")
+  }
+  if (has_codex) {
+    return("codex_cli")
+  }
+  "api_key"
+}
+
+ravel_copilot_binary <- function() {
+  path <- Sys.which("copilot")
+  if (nzchar(path)) {
+    return(path)
+  }
+
+  roots <- c(
+    file.path(Sys.getenv("LOCALAPPDATA"), "Microsoft", "WinGet", "Packages"),
+    file.path(Sys.getenv("LOCALAPPDATA"), "GitHub CLI", "copilot")
+  )
+
+  for (root in roots) {
+    if (!dir.exists(root)) {
+      next
+    }
+    hits <- list.files(
+      root,
+      pattern = "^copilot(\\.exe)?$",
+      recursive = TRUE,
+      full.names = TRUE,
+      ignore.case = TRUE
+    )
+    if (length(hits)) {
+      return(hits[[1]])
+    }
+  }
+
+  NULL
+}
+
+ravel_gh_auth_token <- function() {
+  if (!ravel_command_available("gh")) {
+    return(NULL)
+  }
+
+  output <- tryCatch(
+    system2("gh", c("auth", "token"), stdout = TRUE, stderr = TRUE),
+    error = function(e) character()
+  )
+  status_code <- attr(output, "status", exact = TRUE) %||% 0L
+  token <- trimws(output[[1]] %||% "")
+  if (!identical(status_code, 0L) || !nzchar(token)) {
+    return(NULL)
+  }
+  token
+}
+
+ravel_copilot_token <- function() {
+  env <- ravel_lookup_env_secret(c("COPILOT_GITHUB_TOKEN", "GH_TOKEN", "GITHUB_TOKEN"))
+  env %||% ravel_gh_auth_token()
+}
+
+ravel_copilot_auth_status <- function() {
+  binary <- ravel_copilot_binary()
+  if (is.null(binary)) {
+    return(list(
+      configured = FALSE,
+      mode = "oauth_device_flow",
+      detail = "Copilot CLI is not installed. Install the official `copilot` CLI first."
+    ))
+  }
+
+  token <- ravel_copilot_token()
+  if (!is.null(token)) {
+    return(list(
+      configured = TRUE,
+      mode = "gh_cli_oauth_token",
+      detail = "Copilot CLI is installed and a supported GitHub token is available."
+    ))
+  }
+
+  list(
+    configured = TRUE,
+    mode = "oauth_device_flow",
+    detail = paste(
+      "Copilot CLI is installed. Run `copilot login` to start the",
+      "official OAuth device flow."
+    )
+  )
 }
 
 ravel_openai_auth_status <- function() {
   api_key <- ravel_get_secret("openai", "api_key")
-  codex <- ravel_command_available("codex")
+  codex <- ravel_codex_cli_logged_in()
+  mode <- ravel_openai_auth_mode(
+    settings = ravel_read_settings(),
+    has_api_key = !is.null(api_key),
+    has_codex = codex
+  )
+
+  if (!is.null(api_key) && codex) {
+    return(list(
+      configured = TRUE,
+      mode = mode,
+      detail = "OpenAI API key and Codex CLI login are both configured."
+    ))
+  }
   if (!is.null(api_key)) {
     return(list(configured = TRUE, mode = "api_key", detail = "OpenAI API key is configured."))
   }
@@ -325,7 +434,7 @@ ravel_login <- function(provider = c("openai", "copilot", "gemini", "anthropic")
         provider = provider,
         mode = chosen,
         supported = TRUE,
-        command = if (identical(chosen, "codex_cli")) "codex" else NULL,
+        command = if (identical(chosen, "codex_cli")) "codex login" else NULL,
         detail = if (identical(chosen, "codex_cli")) {
           "Install and run the official Codex CLI to sign in with a ChatGPT account or API key."
         } else {
@@ -335,12 +444,12 @@ ravel_login <- function(provider = c("openai", "copilot", "gemini", "anthropic")
     },
     copilot = list(
       provider = provider,
-      mode = mode %||% "gh_cli",
+      mode = mode %||% "oauth_device_flow",
       supported = TRUE,
-      command = "gh auth login",
+      command = "copilot login",
       detail = paste(
-        "Authenticate GitHub CLI, then ensure the Copilot CLI",
-        "surface is available through `gh copilot`."
+        "Use the official Copilot CLI login flow, or provide a supported token",
+        "through COPILOT_GITHUB_TOKEN, GH_TOKEN, or GITHUB_TOKEN."
       )
     ),
     gemini = list(

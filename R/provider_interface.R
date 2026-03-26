@@ -136,6 +136,26 @@ ravel_normalize_messages <- function(messages, context = NULL) {
   normalized
 }
 
+ravel_cli_provider_prompt <- function(messages, context, provider_label) {
+  normalized <- ravel_normalize_messages(messages, context)
+  system_prompt <- normalized[[1]]$content
+  history <- vapply(
+    normalized[-1],
+    function(msg) paste0(toupper(msg$role), ": ", msg$content),
+    character(1)
+  )
+
+  paste(
+    sprintf("Provider: %s", provider_label),
+    "System instructions:",
+    system_prompt,
+    "",
+    "Conversation:",
+    paste(history, collapse = "\n\n"),
+    sep = "\n"
+  )
+}
+
 ravel_extract_code_blocks <- function(text) {
   pattern <- "```([[:alnum:]{}_:-]*)\\n([\\s\\S]*?)```"
   matches <- gregexpr(pattern, text, perl = TRUE)

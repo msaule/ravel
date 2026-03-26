@@ -8,8 +8,16 @@
 \description{
 Ravel is an RStudio-native coding and analytics copilot for R users.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/msaule/ravel}
+  \item Report bugs at \url{https://github.com/msaule/ravel/issues}
+}
+
+}
 \author{
-\strong{Maintainer}: Ravel Contributors \email{opensource@ravel.dev}
+\strong{Maintainer}: Markuss Saule \email{markusstomas@gmail.com}
 
 }
 \keyword{internal}

@@ -295,6 +295,16 @@ ravel_launch_settings_gadget <- function() {
         choices = stats::setNames(providers$provider, providers$label),
         selected = settings$default_provider
       ),
+      shiny::selectInput(
+        "openai_auth_mode",
+        "OpenAI auth mode",
+        choices = c(
+          auto = "auto",
+          api_key = "api_key",
+          codex_cli = "codex_cli"
+        ),
+        selected = settings$provider_auth_modes$openai %||% "auto"
+      ),
       shiny::textInput("openai_key", "OpenAI API key", value = ""),
       shiny::textInput("gemini_key", "Gemini API key", value = ""),
       shiny::textInput("gemini_token", "Gemini bearer token", value = ""),
@@ -332,6 +342,9 @@ ravel_launch_settings_gadget <- function() {
 
     shiny::observeEvent(input$save, {
       ravel_set_setting("default_provider", input$default_provider)
+      modes <- ravel_get_setting("provider_auth_modes", default = list())
+      modes$openai <- input$openai_auth_mode
+      ravel_set_setting("provider_auth_modes", modes)
       if (nzchar(trimws(input$openai_key))) {
         ravel_set_api_key("openai", input$openai_key, persist = input$persist)
       }

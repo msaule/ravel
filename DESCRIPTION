@@ -2,11 +2,13 @@ Package: ravel
 Title: RStudio Native AI Copilot for R Analysis Workflows
 Version: 0.0.1
 Authors@R: 
-    person("Ravel", "Contributors", , "opensource@ravel.dev", role = c("aut", "cre"))
+    person("Markuss", "Saule", , "markusstomas@gmail.com", role = c("aut", "cre"))
 Description: An RStudio and Posit native AI copilot for R users with
     project context, object awareness, model interpretation helpers,
     Quarto drafting, safe code execution, and multi-provider support.
 License: MIT + file LICENSE
+URL: https://github.com/msaule/ravel
+BugReports: https://github.com/msaule/ravel/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3

@@ -6,6 +6,7 @@
 *.tar.gz
 check/
 *.Rcheck/
+codex_last.txt
 docs/
 inst/doc
 Meta/

@@ -36,8 +36,8 @@ Ravel is explicit about what is supported today, what is experimental, and what 
 | Provider | Status in MVP | Auth modes in package | Notes |
 | --- | --- | --- | --- |
 | OpenAI API | Implemented | API key | Implemented against OpenAI HTTP APIs. |
-| OpenAI Codex / ChatGPT | Partial | Codex CLI sign-in, API key fallback | Official Codex CLI supports sign-in with a ChatGPT account or API key. Ravel exposes the auth boundary and settings, but in-addin chat is implemented through the OpenAI API path today. |
-| GitHub Copilot | Experimental | GitHub CLI login / Copilot CLI | Ravel includes a provider adapter for `gh copilot`. It uses official GitHub auth state and CLI execution when available. Deep Copilot internals are intentionally not used. |
+| OpenAI Codex / ChatGPT | Working | Codex CLI sign-in, API key fallback | Ravel can use the official Codex CLI as a login-first OpenAI path, and can fall back to it automatically when the API path is rate-limited in `auto` mode. |
+| GitHub Copilot | Working | Copilot CLI OAuth/device flow, GitHub CLI OAuth token | Ravel uses the official standalone Copilot CLI. It can authenticate via `copilot login` or supported GitHub tokens such as the OAuth token from `gh auth`. |
 | Gemini | Implemented for API key, OAuth-ready abstraction | API key, bearer token/OAuth-style token slot | API-key flow is implemented. OAuth is represented in the auth abstraction so the provider boundary stays clean. |
 | Anthropic | Implemented | API key | Official API-key auth only. No consumer-login mode is claimed. |
 
@@ -46,8 +46,8 @@ Ravel is explicit about what is supported today, what is experimental, and what 
 Ravel follows official patterns:
 
 - OpenAI API uses bearer API keys.
-- OpenAI login-first support is modeled through the official Codex CLI sign-in flow, not by pretending ChatGPT subscriptions are a drop-in API.
-- GitHub Copilot support is routed through the official GitHub CLI / Copilot CLI surface when available.
+- OpenAI login-first support uses the official Codex CLI sign-in flow, not a pretend ChatGPT API.
+- GitHub Copilot support uses the official Copilot CLI and supported GitHub OAuth tokens.
 - Gemini supports API-key mode and a bearer-token auth slot for official OAuth-based flows.
 - Anthropic requires API keys.
 
