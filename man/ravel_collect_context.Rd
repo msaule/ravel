@@ -12,6 +12,8 @@ ravel_collect_context(
   include_plot = TRUE,
   include_session = TRUE,
   include_project = TRUE,
+  include_git = TRUE,
+  include_activity = TRUE,
   envir = .GlobalEnv,
   max_objects = 10L
 )
@@ -30,6 +32,10 @@ ravel_collect_context(
 \item{include_session}{Include session information.}
 
 \item{include_project}{Include project root and file listing.}
+
+\item{include_git}{Include git status and diff summaries when available.}
+
+\item{include_activity}{Include recent Ravel action state.}
 
 \item{envir}{Environment used for object summaries.}
 

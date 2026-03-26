@@ -1,8 +1,25 @@
+<p align="center">
+  <img src="man/figures/ravel-banner.svg" alt="Ravel banner" width="100%" />
+</p>
+
 # Ravel
+
+[![R-CMD-check](https://github.com/msaule/ravel/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/msaule/ravel/actions/workflows/R-CMD-check.yaml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://github.com/msaule/ravel)
 
 Ravel is an RStudio/Posit-native coding and analytics copilot for R users.
 
 It is designed for code generation, object-aware analysis, statistical interpretation, safe execution, and reproducible authoring inside RStudio workflows. The package is intentionally R-first: it understands scripts, selections, data frames, formulas, model objects, console state captured through Ravel actions, and Quarto/R Markdown authoring tasks.
+
+## Quick start
+
+```r
+install.packages("pak")
+pak::pak("msaule/ravel")
+library(ravel)
+ravel::ravel_setup_addin()
+```
 
 ## Why Ravel
 
@@ -56,7 +73,7 @@ If a provider is unavailable or only partially supported, Ravel surfaces that cl
 
 ## Installation
 
-For regular users, the easiest install path today is one command:
+For regular users, the easiest install path today is:
 
 ```r
 install.packages("pak")
@@ -187,6 +204,9 @@ Ravel does not silently execute generated code by default.
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) explains the layers and execution model.
 - [ROADMAP.md](ROADMAP.md) lays out the planned phases beyond the MVP.
+- [CONTRIBUTING.md](CONTRIBUTING.md) explains the developer workflow and release checks.
+- [RELEASING.md](RELEASING.md) captures the CRAN and R-universe release path.
+- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) describes community expectations.
 - [AGENTS.md](AGENTS.md) describes collaboration conventions for contributors and coding agents.
 
 ## References

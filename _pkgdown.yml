@@ -1,0 +1,70 @@
+template:
+  bootstrap: 5
+  bslib:
+    bootswatch: flatly
+
+url: https://msaule.github.io/ravel
+
+home:
+  title: Ravel
+  description: RStudio-native AI copilot for R analysis workflows.
+
+navbar:
+  structure:
+    left: [intro, reference, articles, news]
+    right: [github]
+  components:
+    intro:
+      text: Get started
+      href: index.html
+    news:
+      text: News
+      href: news/index.html
+    github:
+      icon: fa-github
+      aria-label: GitHub repository
+      href: https://github.com/msaule/ravel
+
+reference:
+  - title: Addins and setup
+    contents:
+      - ravel_chat_addin
+      - ravel_settings_addin
+      - ravel_setup_addin
+      - ravel_doctor
+      - ravel_verify_provider
+  - title: Context and orchestration
+    contents:
+      - ravel_collect_context
+      - ravel_chat_turn
+      - ravel_list_project_files
+      - ravel_list_providers
+      - ravel_provider_capabilities
+      - ravel_read_history
+  - title: Auth and settings
+    contents:
+      - ravel_auth_status
+      - ravel_login
+      - ravel_logout
+      - ravel_launch_login
+      - ravel_open_provider_page
+      - ravel_set_api_key
+      - ravel_set_bearer_token
+      - ravel_get_setting
+      - ravel_set_setting
+  - title: Safe actions and analysis helpers
+    contents:
+      - ravel_preview_code
+      - ravel_run_code
+      - ravel_apply_action
+      - ravel_stage_file_write
+      - ravel_approve_action
+      - ravel_reject_action
+      - ravel_summarize_object
+      - ravel_summarize_model
+      - ravel_interpret_model
+      - ravel_suggest_diagnostics
+      - ravel_draft_quarto_section
+  - title: Developer internals
+    contents:
+      - ravel_new_action

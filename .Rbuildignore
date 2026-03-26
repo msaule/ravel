@@ -5,5 +5,13 @@
 (^|[\\/])ROADMAP\.md$
 (^|[\\/])ARCHITECTURE\.md$
 (^|[\\/])LICENSE\.md$
+^CODE_OF_CONDUCT\.md$
+^CONTRIBUTING\.md$
+^RELEASING\.md$
+^cran-comments\.md$
+^_pkgdown\.yml$
+^CITATION\.cff$
+^docs$
+^vignettes/.*\.html$
 ^.*\.Rproj$
 ^\.Rproj\.user$

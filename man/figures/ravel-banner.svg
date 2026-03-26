@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-labelledby="title desc">
+  <title id="title">Ravel</title>
+  <desc id="desc">RStudio-native AI copilot for R analysis workflows.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#f7f1e6"/>
+      <stop offset="100%" stop-color="#efe3cf"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" x2="100%" y1="0%" y2="0%">
+      <stop offset="0%" stop-color="#2c5f5d"/>
+      <stop offset="100%" stop-color="#8c4f2d"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="360" rx="28" fill="url(#bg)"/>
+  <path d="M90 256C176 144 260 120 334 156C404 190 470 198 540 144C618 84 710 86 794 142C864 188 932 196 1010 148" fill="none" stroke="url(#accent)" stroke-width="22" stroke-linecap="round"/>
+  <path d="M90 292C164 234 230 222 298 242C378 264 446 262 530 220C620 174 712 174 796 220C868 260 938 270 1018 240" fill="none" stroke="#d6b992" stroke-width="12" stroke-linecap="round"/>
+  <text x="86" y="150" fill="#2a2a24" font-family="'Aptos Display', 'Segoe UI', sans-serif" font-size="92" font-weight="700">Ravel</text>
+  <text x="90" y="196" fill="#5a5044" font-family="'Aptos', 'Segoe UI', sans-serif" font-size="28">RStudio-native AI copilot for R analysis workflows</text>
+  <rect x="90" y="74" width="172" height="34" rx="17" fill="#2c5f5d" opacity="0.12"/>
+  <text x="112" y="97" fill="#2c5f5d" font-family="'Aptos', 'Segoe UI', sans-serif" font-size="18" font-weight="700">ANALYSIS-AWARE</text>
+</svg>

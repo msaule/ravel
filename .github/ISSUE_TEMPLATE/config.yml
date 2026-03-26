@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Ravel architecture and roadmap
+    url: https://github.com/msaule/ravel
+    about: Read the project docs before opening broad design issues.

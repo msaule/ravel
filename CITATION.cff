@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+title: "Ravel"
+message: "If you use Ravel, please cite the software using the metadata below."
+type: software
+license: MIT
+authors:
+  - family-names: Saule
+    given-names: Markuss
+    email: markusstomas@gmail.com
+repository-code: "https://github.com/msaule/ravel"
+abstract: "RStudio-native AI copilot for R analysis workflows with project, object, and git-aware context."
+keywords:
+  - R
+  - RStudio
+  - Posit
+  - AI assistant
+  - statistics
+  - Quarto
+version: 0.1.0
+date-released: 2026-03-26

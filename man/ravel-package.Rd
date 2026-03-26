@@ -17,7 +17,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Markuss Saule \email{markusstomas@gmail.com}
+\strong{Maintainer}: Markuss Saule \email{markusstomas@gmail.com} [copyright holder]
 
 }
 \keyword{internal}

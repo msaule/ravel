@@ -10,3 +10,4 @@ codex_last.txt
 docs/
 inst/doc
 Meta/
+vignettes/*.html

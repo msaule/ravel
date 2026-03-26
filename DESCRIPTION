@@ -1,14 +1,18 @@
 Package: ravel
-Title: RStudio Native AI Copilot for R Analysis Workflows
+Title: RStudio-Native AI Copilot for R Analysis Workflows
 Version: 0.1.0
 Authors@R: 
-    person("Markuss", "Saule", , "markusstomas@gmail.com", role = c("aut", "cre"))
+    person("Markuss", "Saule", , "markusstomas@gmail.com", role = c("aut", "cre", "cph"))
 Description: An RStudio and Posit native AI copilot for R users with
-    project context, object awareness, model interpretation helpers,
-    Quarto drafting, safe code execution, and multi-provider support.
+    active-editor, workspace, object, console, plot, and git-aware context.
+    Provides statistical helpers for interpreting 'lm()' and 'glm()'
+    models, stages code and file actions before execution, drafts
+    reproducible 'Quarto' content, and connects to official provider
+    APIs or CLIs for OpenAI, GitHub Copilot, Gemini, and Anthropic.
 License: MIT + file LICENSE
 URL: https://github.com/msaule/ravel
 BugReports: https://github.com/msaule/ravel/issues
+Language: en-US
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
@@ -30,7 +34,11 @@ Suggests:
     keyring,
     knitr,
     lintr,
+    pkgdown,
+    rcmdcheck,
     rmarkdown,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
+Config/Needs/website: pkgdown
+Config/Needs/release: devtools, rcmdcheck, roxygen2
