@@ -98,6 +98,109 @@ ravel_collect_context_from_ui <- function(selected, envir = globalenv()) {
   )
 }
 
+ravel_context_with_preview <- function(context, pending_action = NULL, preview_text = NULL) {
+  preview_text <- trimws(preview_text %||% "")
+  if (!nzchar(preview_text) && is.null(pending_action)) {
+    return(context)
+  }
+
+  context$preview <- list(
+    has_staged_preview = TRUE,
+    action_type = pending_action$type %||% "preview",
+    label = pending_action$label %||% "Staged preview",
+    text = if (nzchar(preview_text)) ravel_trim_text(preview_text, 4000L) else NULL
+  )
+  context
+}
+
+ravel_context_basis_html <- function(context) {
+  document <- context$document %||% list()
+  project <- context$project %||% list()
+
+  doc_path <- document$path %||% ""
+  doc_name <- document$name %||% if (nzchar(doc_path)) basename(doc_path) else "Untitled editor"
+  workspace_root <- project$root %||% context$session$workspace_root %||% ""
+  working_directory <- project$working_directory %||% context$session$working_directory %||% ""
+  within_workspace <- document$within_workspace_root
+
+  lines <- character()
+
+  if (nzchar(doc_path)) {
+    lines <- c(
+      lines,
+      sprintf(
+        "<strong>Active editor:</strong> %s",
+        ravel_escape_html(doc_name)
+      ),
+      sprintf(
+        "<span class='ravel-context-path'>%s</span>",
+        ravel_escape_html(doc_path)
+      )
+    )
+  } else {
+    lines <- c(lines, "<strong>Active editor:</strong> Unsaved or unavailable")
+  }
+
+  if (nzchar(workspace_root)) {
+    lines <- c(
+      lines,
+      sprintf(
+        "<strong>Workspace root:</strong> <span class='ravel-context-path'>%s</span>",
+        ravel_escape_html(workspace_root)
+      )
+    )
+  }
+
+  if (nzchar(working_directory) && !identical(working_directory, workspace_root)) {
+    lines <- c(
+      lines,
+      sprintf(
+        "<strong>Working directory:</strong> <span class='ravel-context-path'>%s</span>",
+        ravel_escape_html(working_directory)
+      )
+    )
+  }
+
+  if (isTRUE(within_workspace)) {
+    lines <- c(lines, "Ravel is using the active editor and the workspace context together.")
+  } else if (identical(within_workspace, FALSE)) {
+    lines <- c(
+      lines,
+      paste(
+        "Ravel is using the active editor even though it is outside the workspace root,",
+        "and it is keeping the workspace context alongside it."
+      )
+    )
+    if (length(document$sibling_files %||% character())) {
+      lines <- c(
+        lines,
+        sprintf(
+          "Nearby files from the active editor folder are also included (%d tracked).",
+          length(document$sibling_files)
+        )
+      )
+    }
+  } else {
+    lines <- c(lines, "Ravel is using the editor context alongside the current workspace context.")
+  }
+
+  if (isTRUE(context$preview$has_staged_preview %||% FALSE)) {
+    lines <- c(lines, "The current action preview is also included in context.")
+  }
+
+  if (length(context$activity$recent_actions %||% list())) {
+    lines <- c(
+      lines,
+      sprintf(
+        "Recent Ravel actions in memory: %d.",
+        length(context$activity$recent_actions)
+      )
+    )
+  }
+
+  shiny::HTML(paste(lines, collapse = "<br/>"))
+}
+
 ravel_insert_active_doc <- function(text) {
   if (!rstudioapi::isAvailable()) {
     cli::cli_abort("RStudio is not available; cannot insert text into the active document.")
@@ -244,6 +347,20 @@ ravel_launch_chat_gadget <- function() {
           color: #6f665b;
           margin: 4px 0 10px 0;
         }
+        .ravel-context-shell {
+          background: #f8f3ea;
+          border: 1px solid #ddd5c7;
+          border-radius: 12px;
+          padding: 10px 12px;
+          margin-bottom: 12px;
+          color: #4d463d;
+          font-size: 12px;
+          line-height: 1.5;
+        }
+        .ravel-context-path {
+          font-family: Consolas, 'Courier New', monospace;
+          font-size: 11px;
+        }
         .ravel-preview-label {
           font-size: 16px;
           font-weight: 700;
@@ -334,6 +451,10 @@ ravel_launch_chat_gadget <- function() {
                 shiny::uiOutput("chat_status")
               ),
               shiny::div(
+                class = "ravel-context-shell",
+                shiny::uiOutput("context_basis")
+              ),
+              shiny::div(
                 id = "ravel-chat-scroll",
                 class = "ravel-chat-log",
                 shiny::uiOutput("conversation_ui")
@@ -394,6 +515,21 @@ ravel_launch_chat_gadget <- function() {
       last_context = NULL,
       is_waiting = FALSE
     )
+    context_refresh_nonce <- shiny::reactiveVal(0L)
+    live_context <- shiny::reactive({
+      input$context_sources
+      input$code_preview
+      rv$pending_action
+      context_refresh_nonce()
+      shiny::invalidateLater(1500, session)
+
+      context <- ravel_collect_context_from_ui(input$context_sources)
+      ravel_context_with_preview(
+        context,
+        pending_action = rv$pending_action,
+        preview_text = input$code_preview
+      )
+    })
 
     output$model_ui <- shiny::renderUI({
       provider <- ravel_get_provider(input$provider)
@@ -444,6 +580,10 @@ ravel_launch_chat_gadget <- function() {
       shiny::HTML("<div class='ravel-status-chip'>Ready for the next message.</div>")
     })
 
+    output$context_basis <- shiny::renderUI({
+      ravel_context_basis_html(live_context())
+    })
+
     shiny::observe({
       rv$messages
       rv$is_waiting
@@ -455,8 +595,12 @@ ravel_launch_chat_gadget <- function() {
       )
     })
 
+    shiny::observe({
+      rv$last_context <- live_context()
+    })
+
     shiny::observeEvent(input$refresh_context, {
-      rv$last_context <- ravel_collect_context_from_ui(input$context_sources)
+      context_refresh_nonce(context_refresh_nonce() + 1L)
       shiny::showNotification("Context refreshed.", type = "message")
     })
 
@@ -504,7 +648,7 @@ ravel_launch_chat_gadget <- function() {
           detail = "Gathering context and sending your request.",
           value = 0.2,
           {
-            context <- rv$last_context %||% ravel_collect_context_from_ui(input$context_sources)
+            context <- live_context()
             rv$last_context <- context
             shiny::incProgress(0.35, detail = "Provider request in flight.")
             result <- ravel_chat_turn(

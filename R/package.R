@@ -74,6 +74,25 @@ ravel_hash_text <- function(x) {
   digest::digest(paste(x, collapse = "\n"), algo = "xxhash64")
 }
 
+ravel_normalize_path <- function(path) {
+  path <- path %||% ""
+  if (!nzchar(path)) {
+    return("")
+  }
+  normalizePath(path, winslash = "/", mustWork = FALSE)
+}
+
+ravel_path_is_within <- function(path, root) {
+  path <- ravel_normalize_path(path)
+  root <- ravel_normalize_path(root)
+
+  if (!nzchar(path) || !nzchar(root)) {
+    return(FALSE)
+  }
+
+  identical(path, root) || startsWith(path, paste0(root, "/"))
+}
+
 ravel_json_safe <- function(x, depth = 0L) {
   if (depth > 4L) {
     return(ravel_trim_text(utils::capture.output(utils::str(x, max.level = 1L)), 500L))

@@ -19,3 +19,30 @@ test_that("message UI renders waiting state and content clearly", {
   expect_match(html, "Waiting for a response\\.\\.\\.", perl = TRUE)
   expect_match(html, "ravel-message-user", perl = TRUE)
 })
+
+test_that("context basis explains editor and workspace together", {
+  html <- as.character(ravel:::ravel_context_basis_html(list(
+    document = list(
+      path = "C:/outside/analysis.R",
+      name = "analysis.R",
+      within_workspace_root = FALSE,
+      sibling_files = c("helper.R", "notes.qmd")
+    ),
+    project = list(
+      root = "C:/workspace",
+      working_directory = "C:/workspace"
+    ),
+    preview = list(
+      has_staged_preview = TRUE
+    ),
+    activity = list(
+      recent_actions = list(list(id = "action_1"))
+    )
+  )))
+
+  expect_match(html, "Active editor", fixed = TRUE)
+  expect_match(html, "Workspace root", fixed = TRUE)
+  expect_match(html, "outside the workspace root", fixed = TRUE)
+  expect_match(html, "action preview", fixed = TRUE)
+  expect_match(html, "Recent Ravel actions", fixed = TRUE)
+})
