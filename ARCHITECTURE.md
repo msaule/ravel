@@ -61,6 +61,7 @@ Responsibilities:
 
 Files:
 
+- `R/context_git.R`
 - `R/context_session.R`
 - `R/context_objects.R`
 - `R/context_console.R`
@@ -72,6 +73,7 @@ Responsibilities:
 - collect active document and selection state
 - summarize loaded objects with type-aware compression
 - collect project and package metadata
+- collect git branch, file status, and compact diff excerpts
 - summarize plot/device state when available
 - capture console output generated through Ravel-managed execution
 
@@ -133,6 +135,7 @@ The normalized context payload contains:
 - truncated active file contents
 - project root
 - project file listing
+- git branch, changed files, and focused diff excerpts
 - package/session info
 - object summaries
 - recent Ravel-managed console output

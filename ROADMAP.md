@@ -39,6 +39,7 @@
 - Settings UX for auth and provider defaults
 - Conversation/session persistence across projects
 - More plot-aware and console-aware tooling
+- Easier release distribution through R-universe, then CRAN readiness
 - Vignettes, examples, and contributor docs
 
 ## Phase 6: Agentic actions

@@ -109,6 +109,7 @@ ravel_session_info_context <- function(workspace_root = NULL) {
 #' @param include_plot Include current plot metadata when available.
 #' @param include_session Include session information.
 #' @param include_project Include project root and file listing.
+#' @param include_git Include git status and diff summaries when available.
 #' @param include_activity Include recent Ravel action state.
 #' @param envir Environment used for object summaries.
 #' @param max_objects Maximum number of objects to summarize.
@@ -122,6 +123,7 @@ ravel_collect_context <- function(include_selection = TRUE,
                                   include_plot = TRUE,
                                   include_session = TRUE,
                                   include_project = TRUE,
+                                  include_git = TRUE,
                                   include_activity = TRUE,
                                   envir = .GlobalEnv,
                                   max_objects = 10L) {
@@ -156,6 +158,13 @@ ravel_collect_context <- function(include_selection = TRUE,
 
   if (include_session) {
     context$session <- ravel_session_info_context(workspace_root = root)
+  }
+
+  if (include_git) {
+    context$git <- ravel_collect_git_context(
+      workspace_root = root,
+      active_path = context$document$path %||% ""
+    )
   }
 
   if (include_activity) {

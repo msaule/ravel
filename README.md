@@ -24,6 +24,7 @@ The repository currently includes:
 - Provider abstractions for OpenAI, GitHub Copilot CLI, Gemini, and Anthropic
 - Auth and settings helpers with optional secure secret storage via `keyring`
 - Context gathering for active document, selection, workspace objects, project files, session info, plot metadata, and Ravel-captured console output
+- Git-aware context for workspace diffs, branch state, and focused file changes
 - Safe code preview / approval helpers for running code or applying file edits
 - Statistical helpers for model summarization, coefficient interpretation, and diagnostic suggestions
 - Quarto drafting helpers for results, methods, and diagnostics sections
@@ -55,7 +56,7 @@ If a provider is unavailable or only partially supported, Ravel surfaces that cl
 
 ## Installation
 
-For regular users, the easiest install path is one command:
+For regular users, the easiest install path today is one command:
 
 ```r
 install.packages("pak")
@@ -72,6 +73,32 @@ install.packages("keyring")
 ```
 
 `keyring` lets Ravel store API keys more securely than plain session memory.
+
+### Standard `install.packages("ravel")`
+
+Not yet, at least not from the default CRAN mirror.
+
+For a plain:
+
+```r
+install.packages("ravel")
+```
+
+to work for most users without extra repository configuration, Ravel needs to
+be published to CRAN.
+
+For a near-term middle ground, Ravel can also be published through
+`r-universe`, which gives users a normal `install.packages()` flow with one
+extra repository entry:
+
+```r
+install.packages(
+  "ravel",
+  repos = c("https://msaule.r-universe.dev", "https://cloud.r-project.org")
+)
+```
+
+The current easiest path remains `pak::pak("msaule/ravel")` from GitHub.
 
 ### Development installs
 
@@ -127,6 +154,7 @@ You can also launch the setup panel from the RStudio Addins menu.
 ## What the addin can do
 
 - Ask questions about selected R code
+- Use recent git diffs and branch state as part of project context
 - Explain model summaries and coefficients
 - Summarize loaded data frames and model objects
 - Draft Quarto sections from live analysis context

@@ -17,7 +17,8 @@ ravel_default_settings <- function() {
       console = TRUE,
       plot = TRUE,
       session = TRUE,
-      project = TRUE
+      project = TRUE,
+      git = TRUE
     )
   )
 }

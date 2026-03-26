@@ -35,6 +35,15 @@ test_that("context basis explains editor and workspace together", {
     preview = list(
       has_staged_preview = TRUE
     ),
+    git = list(
+      workspace = list(
+        branch = "main",
+        changed_file_count = 3L
+      ),
+      editor = list(
+        branch = "feature/editor"
+      )
+    ),
     activity = list(
       recent_actions = list(list(id = "action_1"))
     )
@@ -45,4 +54,6 @@ test_that("context basis explains editor and workspace together", {
   expect_match(html, "outside the workspace root", fixed = TRUE)
   expect_match(html, "action preview", fixed = TRUE)
   expect_match(html, "Recent Ravel actions", fixed = TRUE)
+  expect_match(html, "Workspace git context", fixed = TRUE)
+  expect_match(html, "tracked separately", fixed = TRUE)
 })

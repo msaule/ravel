@@ -85,6 +85,7 @@ ravel_render_messages_ui <- function(messages, waiting = FALSE) {
   shiny::HTML(paste(blocks, collapse = "\n"))
 }
 
+# nolint start: object_usage_linter
 ravel_collect_context_from_ui <- function(selected, envir = globalenv()) {
   ravel_collect_context(
     include_selection = "selection" %in% selected,
@@ -94,9 +95,11 @@ ravel_collect_context_from_ui <- function(selected, envir = globalenv()) {
     include_plot = "plot" %in% selected,
     include_session = "session" %in% selected,
     include_project = "project" %in% selected,
+    include_git = "git" %in% selected,
     envir = envir
   )
 }
+# nolint end
 
 ravel_context_with_preview <- function(context, pending_action = NULL, preview_text = NULL) {
   preview_text <- trimws(preview_text %||% "")
@@ -194,6 +197,29 @@ ravel_context_basis_html <- function(context) {
       sprintf(
         "Recent Ravel actions in memory: %d.",
         length(context$activity$recent_actions)
+      )
+    )
+  }
+
+  workspace_git <- context$git$workspace %||% NULL
+  if (!is.null(workspace_git)) {
+    lines <- c(
+      lines,
+      sprintf(
+        "Workspace git context: branch %s, %d changed files.",
+        ravel_escape_html(workspace_git$branch %||% "detached"),
+        workspace_git$changed_file_count %||% 0L
+      )
+    )
+  }
+
+  editor_git <- context$git$editor %||% NULL
+  if (!is.null(editor_git)) {
+    lines <- c(
+      lines,
+      sprintf(
+        "Active editor repo is also tracked separately on branch %s.",
+        ravel_escape_html(editor_git$branch %||% "detached")
       )
     )
   }
@@ -427,7 +453,8 @@ ravel_launch_chat_gadget <- function() {
                   console = "console",
                   plot = "plot",
                   session = "session",
-                  project = "project"
+                  project = "project",
+                  git = "git"
                 ),
                 selected = default_context
               ),
