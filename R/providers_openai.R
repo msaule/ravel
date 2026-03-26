@@ -52,7 +52,8 @@ ravel_openai_api_chat <- function(messages, context, model) {
 }
 
 ravel_openai_codex_cli_chat <- function(messages, context, model) {
-  if (!ravel_codex_cli_logged_in()) {
+  binary <- ravel_codex_binary()
+  if (is.null(binary) || !ravel_codex_cli_logged_in()) {
     cli::cli_abort(c(
       "Codex CLI is not logged in.",
       "i" = "Run {.code codex login} or switch the OpenAI auth mode back to API key."
@@ -79,7 +80,7 @@ ravel_openai_codex_cli_chat <- function(messages, context, model) {
     args <- c(args, "--model", model)
   }
 
-  output <- system2("codex", args, stdout = TRUE, stderr = TRUE, stdin = prompt_file)
+  output <- system2(binary, args, stdout = TRUE, stderr = TRUE, stdin = prompt_file)
   status_code <- attr(output, "status", exact = TRUE) %||% 0L
   if (!identical(status_code, 0L)) {
     cli::cli_abort(ravel_trim_text(output, 1000L))

@@ -5,3 +5,5 @@
 (^|[\\/])ROADMAP\.md$
 (^|[\\/])ARCHITECTURE\.md$
 (^|[\\/])LICENSE\.md$
+^.*\.Rproj$
+^\.Rproj\.user$

@@ -203,13 +203,51 @@ ravel_command_available <- function(command) {
   nzchar(Sys.which(command))
 }
 
+ravel_codex_binary <- function() {
+  path <- Sys.which("codex")
+  if (nzchar(path)) {
+    return(normalizePath(path, winslash = "/", mustWork = FALSE))
+  }
+
+  roots <- c(
+    file.path(Sys.getenv("USERPROFILE"), ".vscode", "extensions"),
+    file.path(Sys.getenv("HOME"), ".vscode", "extensions")
+  )
+
+  for (root in unique(roots)) {
+    if (!dir.exists(root)) {
+      next
+    }
+    hits <- Sys.glob(file.path(root, "openai.chatgpt-*", "bin", "*", "codex.exe"))
+    hits <- c(hits, Sys.glob(file.path(root, "openai.chatgpt-*", "bin", "*", "codex")))
+    hits <- sort(unique(hits), decreasing = TRUE)
+    if (length(hits)) {
+      return(normalizePath(hits[[1]], winslash = "/", mustWork = FALSE))
+    }
+  }
+
+  NULL
+}
+
+ravel_codex_login_command <- function() {
+  binary <- ravel_codex_binary()
+  if (is.null(binary)) {
+    return("codex login")
+  }
+  if (ravel_command_available("codex")) {
+    return("codex login")
+  }
+  paste(shQuote(binary), "login")
+}
+
 ravel_codex_cli_logged_in <- function() {
-  if (!ravel_command_available("codex")) {
+  binary <- ravel_codex_binary()
+  if (is.null(binary)) {
     return(FALSE)
   }
 
   output <- tryCatch(
-    system2("codex", c("login", "status"), stdout = TRUE, stderr = TRUE),
+    system2(binary, c("login", "status"), stdout = TRUE, stderr = TRUE),
     error = function(e) character()
   )
 
@@ -430,13 +468,19 @@ ravel_login <- function(provider = c("openai", "copilot", "gemini", "anthropic")
     provider,
     openai = {
       chosen <- mode %||% "codex_cli"
+      login_command <- ravel_codex_login_command()
       list(
         provider = provider,
         mode = chosen,
         supported = TRUE,
-        command = if (identical(chosen, "codex_cli")) "codex login" else NULL,
+        command = if (identical(chosen, "codex_cli")) login_command else NULL,
         detail = if (identical(chosen, "codex_cli")) {
-          "Install and run the official Codex CLI to sign in with a ChatGPT account or API key."
+          paste(
+            "Install and run the official Codex CLI to sign in with a ChatGPT account",
+            "or API key. Use",
+            login_command,
+            "when the binary is available outside your shell PATH."
+          )
         } else {
           "Set OPENAI_API_KEY or call ravel_set_api_key('openai', ...)."
         }
