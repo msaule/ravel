@@ -1,14 +1,14 @@
 Package: ravel
-Title: RStudio-Native AI Copilot for R Analysis Workflows
+Title: AI Copilot for R Analysis Workflows in 'RStudio'
 Version: 0.1.1
 Authors@R: 
     person("Markuss", "Saule", , "markusstomas@gmail.com", role = c("aut", "cre", "cph"))
-Description: An RStudio and Posit native AI copilot for R users with
+Description: An AI copilot for R users in 'RStudio' and Posit workflows with
     active-editor, workspace, object, console, plot, and git-aware context.
     Provides statistical helpers for interpreting 'lm()' and 'glm()'
     models, stages code and file actions before execution, drafts
     reproducible 'Quarto' content, and connects to official provider
-    APIs or CLIs for OpenAI, GitHub Copilot, Gemini, and Anthropic.
+    APIs or CLIs for 'OpenAI', 'GitHub Copilot', 'Gemini', and 'Anthropic'.
 License: MIT + file LICENSE
 URL: https://github.com/msaule/ravel,
     https://msaule.github.io/ravel/

@@ -9,8 +9,8 @@
 
 ## Notes
 
-- This is an initial CRAN submission.
-- One note is the expected "New submission" incoming check.
+- This is a resubmission after CRAN feedback requesting single quotes around software names in the Title and Description fields of DESCRIPTION.
+- One note is the expected "New submission" incoming check because the package is not yet on CRAN.
 - One local Windows note reports "unable to verify current time", which appears to be environment-specific.
 - Provider integrations use official APIs or official CLIs only.
 - Network-backed providers are not contacted in examples or tests.
