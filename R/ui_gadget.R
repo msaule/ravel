@@ -86,7 +86,7 @@ ravel_render_messages_ui <- function(messages, waiting = FALSE) {
 }
 
 # nolint start: object_usage_linter
-ravel_collect_context_from_ui <- function(selected, envir = globalenv()) {
+ravel_collect_context_from_ui <- function(selected, envir = NULL) {
   ravel_collect_context(
     include_selection = "selection" %in% selected,
     include_file = "file" %in% selected,

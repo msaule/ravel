@@ -14,7 +14,7 @@ ravel_collect_context(
   include_project = TRUE,
   include_git = TRUE,
   include_activity = TRUE,
-  envir = .GlobalEnv,
+  envir = NULL,
   max_objects = 10L
 )
 }
@@ -37,7 +37,8 @@ ravel_collect_context(
 
 \item{include_activity}{Include recent Ravel action state.}
 
-\item{envir}{Environment used for object summaries.}
+\item{envir}{Environment used for object summaries. When \code{NULL}, Ravel reads
+from the current global workspace without modifying it.}
 
 \item{max_objects}{Maximum number of objects to summarize.}
 }

@@ -13,7 +13,14 @@ ravel_log_event <- function(type, data = list()) {
   )
 
   line <- jsonlite::toJSON(ravel_json_safe(entry), auto_unbox = TRUE, null = "null")
-  cat(line, file = ravel_history_path(), sep = "\n", append = TRUE)
+  state <- ravel_runtime_state()
+  state$history <- c(state$history %||% list(), list(entry))
+  ravel_set_runtime_state(state)
+
+  path <- ravel_history_path()
+  if (!is.null(path)) {
+    cat(line, file = path, sep = "\n", append = TRUE)
+  }
   invisible(entry)
 }
 
@@ -50,14 +57,29 @@ ravel_log_action <- function(action, outcome) {
 #' @param limit Maximum number of history entries to return.
 #'
 #' @return A tibble.
+#'
+#' @details
+#' History stays in session memory by default. To mirror it to disk explicitly,
+#' configure `options(ravel.user_dirs = list(data = "<path>"))`.
 #' @export
 ravel_read_history <- function(limit = 100L) {
   path <- ravel_history_path()
-  if (!file.exists(path)) {
+  if (!is.null(path) && file.exists(path)) {
+    lines <- utils::tail(readLines(path, warn = FALSE), limit)
+  } else {
+    entries <- utils::tail(ravel_runtime_state()$history %||% list(), limit)
+    if (!length(entries)) {
+      return(tibble::tibble())
+    }
+    lines <- vapply(
+      entries,
+      function(entry) jsonlite::toJSON(ravel_json_safe(entry), auto_unbox = TRUE, null = "null"),
+      character(1)
+    )
+  }
+  if (!length(lines)) {
     return(tibble::tibble())
   }
-
-  lines <- utils::tail(readLines(path, warn = FALSE), limit)
   parsed <- jsonlite::stream_in(textConnection(lines), verbose = FALSE)
   tibble::as_tibble(parsed)
 }

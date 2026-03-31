@@ -111,7 +111,8 @@ ravel_session_info_context <- function(workspace_root = NULL) {
 #' @param include_project Include project root and file listing.
 #' @param include_git Include git status and diff summaries when available.
 #' @param include_activity Include recent Ravel action state.
-#' @param envir Environment used for object summaries.
+#' @param envir Environment used for object summaries. When `NULL`, Ravel reads
+#'   from the current global workspace without modifying it.
 #' @param max_objects Maximum number of objects to summarize.
 #'
 #' @return A named list.
@@ -125,8 +126,9 @@ ravel_collect_context <- function(include_selection = TRUE,
                                   include_project = TRUE,
                                   include_git = TRUE,
                                   include_activity = TRUE,
-                                  envir = .GlobalEnv,
+                                  envir = NULL,
                                   max_objects = 10L) {
+  envir <- envir %||% globalenv()
   root <- ravel_project_root()
   context <- list()
 

@@ -1,4 +1,5 @@
-ravel_capture_eval <- function(code, envir = .GlobalEnv) {
+ravel_capture_eval <- function(code, envir = NULL) {
+  envir <- envir %||% ravel_execution_environment()
   warnings <- character()
   messages <- character()
   value <- NULL
@@ -47,11 +48,13 @@ ravel_capture_eval <- function(code, envir = .GlobalEnv) {
 #'
 #' @param action A `ravel_action`.
 #' @param approve Whether to override and treat the action as approved.
-#' @param envir Evaluation environment for code execution.
+#' @param envir Evaluation environment for code execution. When `NULL`,
+#'   Ravel uses a dedicated session-scoped environment that inherits from
+#'   `globalenv()` for reads without writing into `.GlobalEnv` by default.
 #'
 #' @return A structured result list.
 #' @export
-ravel_apply_action <- function(action, approve = FALSE, envir = .GlobalEnv) {
+ravel_apply_action <- function(action, approve = FALSE, envir = NULL) {
   if (!inherits(action, "ravel_action")) {
     cli::cli_abort("`action` must inherit from `ravel_action`.")
   }
@@ -97,11 +100,12 @@ ravel_apply_action <- function(action, approve = FALSE, envir = .GlobalEnv) {
 #'
 #' @param action Either a `ravel_action` or a character string of R code.
 #' @param approve Whether to approve and run immediately.
-#' @param envir Evaluation environment.
+#' @param envir Evaluation environment. When `NULL`, code runs in Ravel's
+#'   dedicated session-scoped execution environment instead of `.GlobalEnv`.
 #'
 #' @return A structured result list.
 #' @export
-ravel_run_code <- function(action, approve = FALSE, envir = .GlobalEnv) {
+ravel_run_code <- function(action, approve = FALSE, envir = NULL) {
   if (is.character(action)) {
     action <- ravel_preview_code(action)
   }

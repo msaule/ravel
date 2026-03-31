@@ -91,7 +91,8 @@ ravel_summarize_object <- function(x, name = NULL) {
   )
 }
 
-ravel_collect_objects <- function(envir = .GlobalEnv, max_objects = 10L) {
+ravel_collect_objects <- function(envir = NULL, max_objects = 10L) {
+  envir <- envir %||% globalenv()
   object_names <- utils::head(ls(envir = envir, all.names = FALSE), max_objects)
   lapply(object_names, function(name) {
     obj <- get(name, envir = envir, inherits = FALSE)

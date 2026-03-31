@@ -18,6 +18,7 @@ test_that("OpenAI auth mode selection honors settings and availability", {
 
 test_that("Codex binary lookup falls back to the VS Code extension install", {
   home <- tempfile("ravel-home-")
+  on.exit(unlink(home, recursive = TRUE, force = TRUE), add = TRUE)
   binary_dir <- file.path(
     home,
     ".vscode",

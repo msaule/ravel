@@ -30,26 +30,35 @@ ravel_settings_path <- function() {
 ravel_read_settings <- function() {
   path <- ravel_settings_path()
   defaults <- ravel_default_settings()
-  if (!file.exists(path)) {
-    return(defaults)
+  file_settings <- list()
+  session_settings <- ravel_runtime_state()$settings %||% list()
+
+  if (!is.null(path) && file.exists(path)) {
+    file_settings <- tryCatch(
+      jsonlite::read_json(path, simplifyVector = FALSE),
+      error = function(e) list()
+    )
   }
 
-  parsed <- tryCatch(
-    jsonlite::read_json(path, simplifyVector = FALSE),
-    error = function(e) defaults
-  )
-
-  utils::modifyList(defaults, parsed, keep.null = TRUE)
+  settings <- utils::modifyList(defaults, file_settings, keep.null = TRUE)
+  utils::modifyList(settings, session_settings, keep.null = TRUE)
 }
 
 ravel_write_settings <- function(settings) {
-  jsonlite::write_json(
-    settings,
-    path = ravel_settings_path(),
-    auto_unbox = TRUE,
-    pretty = TRUE,
-    null = "null"
-  )
+  state <- ravel_runtime_state()
+  state$settings <- settings
+  ravel_set_runtime_state(state)
+
+  path <- ravel_settings_path()
+  if (!is.null(path)) {
+    jsonlite::write_json(
+      settings,
+      path = path,
+      auto_unbox = TRUE,
+      pretty = TRUE,
+      null = "null"
+    )
+  }
   invisible(settings)
 }
 
@@ -71,6 +80,11 @@ ravel_get_setting <- function(key, default = NULL) {
 #' @param value Setting value.
 #'
 #' @return The written settings list, invisibly.
+#'
+#' @details
+#' Settings are stored in session memory by default. To mirror non-sensitive
+#' settings to disk explicitly, configure `options(ravel.user_dirs = list(
+#' config = "<path>"))` before calling this function.
 #' @export
 ravel_set_setting <- function(key, value) {
   settings <- ravel_read_settings()

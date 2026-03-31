@@ -4,14 +4,16 @@
 \alias{ravel_apply_action}
 \title{Execute a staged action}
 \usage{
-ravel_apply_action(action, approve = FALSE, envir = .GlobalEnv)
+ravel_apply_action(action, approve = FALSE, envir = NULL)
 }
 \arguments{
 \item{action}{A \code{ravel_action}.}
 
 \item{approve}{Whether to override and treat the action as approved.}
 
-\item{envir}{Evaluation environment for code execution.}
+\item{envir}{Evaluation environment for code execution. When \code{NULL},
+Ravel uses a dedicated session-scoped environment that inherits from
+\code{globalenv()} for reads without writing into \code{.GlobalEnv} by default.}
 }
 \value{
 A structured result list.

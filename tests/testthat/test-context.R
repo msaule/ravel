@@ -25,6 +25,7 @@ test_that("context collection summarizes loaded objects", {
 test_that("context keeps active editor and workspace context together", {
   root <- file.path(tempdir(), "ravel-context-root")
   external <- file.path(tempdir(), "ravel-context-external")
+  on.exit(unlink(c(root, external), recursive = TRUE, force = TRUE), add = TRUE)
   dir.create(root, recursive = TRUE, showWarnings = FALSE)
   dir.create(external, recursive = TRUE, showWarnings = FALSE)
   writeLines("helper <- TRUE", file.path(external, "helper.R"))

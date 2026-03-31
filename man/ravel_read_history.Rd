@@ -15,3 +15,7 @@ A tibble.
 \description{
 Read recent Ravel history entries
 }
+\details{
+History stays in session memory by default. To mirror it to disk explicitly,
+configure \code{options(ravel.user_dirs = list(data = "<path>"))}.
+}

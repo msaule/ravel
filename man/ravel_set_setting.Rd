@@ -17,3 +17,7 @@ The written settings list, invisibly.
 \description{
 Set a Ravel setting
 }
+\details{
+Settings are stored in session memory by default. To mirror non-sensitive
+settings to disk explicitly, configure \code{options(ravel.user_dirs = list( config = "<path>"))} before calling this function.
+}

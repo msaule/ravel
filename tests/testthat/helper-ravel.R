@@ -11,10 +11,14 @@ reset_ravel_test_state <- function() {
   ravel:::ravel_set_runtime_state(list(
     console_log = character(),
     chat_history = list(),
-    pending_actions = list()
+    pending_actions = list(),
+    settings = NULL,
+    history = list(),
+    execution_env = NULL
   ))
-  if (file.exists(ravel:::ravel_history_path())) {
-    unlink(ravel:::ravel_history_path())
+  history_path <- ravel:::ravel_history_path()
+  if (!is.null(history_path) && file.exists(history_path)) {
+    unlink(history_path)
   }
   invisible(TRUE)
 }

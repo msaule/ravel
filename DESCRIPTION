@@ -5,7 +5,7 @@ Authors@R:
     person("Markuss", "Saule", , "markusstomas@gmail.com", role = c("aut", "cre", "cph"))
 Description: An AI copilot for R users in 'RStudio' and Posit workflows with
     active-editor, workspace, object, console, plot, and git-aware context.
-    Provides statistical helpers for interpreting 'lm()' and 'glm()'
+    Provides statistical helpers for interpreting lm() and glm()
     models, stages code and file actions before execution, drafts
     reproducible 'Quarto' content, and connects to official provider
     APIs or CLIs for 'OpenAI', 'GitHub Copilot', 'Gemini', and 'Anthropic'.

@@ -88,9 +88,13 @@ Ravel is explicit about what is supported today and what is still constrained by
 - No silent code execution by default
 - No silent file edits by default
 - Explicit previews and approvals
-- Structured history for actions and conversations
+- Structured history for actions and conversations, stored in session memory by default
 - Honest provider and auth messaging
 - Statistical caveats when assumptions or limitations are visible
+
+Non-sensitive settings and history stay in session memory by default, so Ravel
+does not write into a user's home filespace unless storage paths are configured
+explicitly through `options(ravel.user_dirs = list(config = "<path>", data = "<path>"))`.
 
 ## Documentation and project guide
 

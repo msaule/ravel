@@ -167,7 +167,9 @@ Nothing is auto-applied by default in the MVP.
 
 ## Logging
 
-Ravel writes history to a user-data directory derived from `tools::R_user_dir("ravel", ...)`.
+Ravel keeps history in session memory by default. If a contributor or user
+explicitly configures `options(ravel.user_dirs = list(data = "<path>"))`,
+Ravel can mirror those logs to disk as JSON Lines.
 
 Logs include:
 

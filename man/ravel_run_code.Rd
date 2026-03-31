@@ -4,14 +4,15 @@
 \alias{ravel_run_code}
 \title{Run R code with explicit approval semantics}
 \usage{
-ravel_run_code(action, approve = FALSE, envir = .GlobalEnv)
+ravel_run_code(action, approve = FALSE, envir = NULL)
 }
 \arguments{
 \item{action}{Either a \code{ravel_action} or a character string of R code.}
 
 \item{approve}{Whether to approve and run immediately.}
 
-\item{envir}{Evaluation environment.}
+\item{envir}{Evaluation environment. When \code{NULL}, code runs in Ravel's
+dedicated session-scoped execution environment instead of \code{.GlobalEnv}.}
 }
 \value{
 A structured result list.

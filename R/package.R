@@ -7,6 +7,30 @@
 
 ravel_state_env <- new.env(parent = emptyenv())
 
+ravel_default_runtime_state <- function() {
+  list(
+    console_log = character(),
+    chat_history = list(),
+    pending_actions = list(),
+    settings = NULL,
+    history = list(),
+    execution_env = NULL
+  )
+}
+
+ravel_merge_runtime_state <- function(state = NULL) {
+  merged <- ravel_default_runtime_state()
+  if (is.null(state) || !length(state)) {
+    return(merged)
+  }
+
+  for (name in names(state)) {
+    merged[[name]] <- state[[name]]
+  }
+
+  merged
+}
+
 .onAttach <- function(libname, pkgname) {
   if (!interactive()) {
     return(invisible(NULL))
@@ -27,14 +51,20 @@ ravel_state_env <- new.env(parent = emptyenv())
 
 ravel_path_config <- function(...) {
   override <- getOption("ravel.user_dirs", default = NULL)
-  path <- override$config %||% tools::R_user_dir("ravel", which = "config")
+  path <- override$config %||% NULL
+  if (is.null(path) || !nzchar(path)) {
+    return(NULL)
+  }
   dir.create(path, recursive = TRUE, showWarnings = FALSE)
   file.path(path, ...)
 }
 
 ravel_path_data <- function(...) {
   override <- getOption("ravel.user_dirs", default = NULL)
-  path <- override$data %||% tools::R_user_dir("ravel", which = "data")
+  path <- override$data %||% NULL
+  if (is.null(path) || !nzchar(path)) {
+    return(NULL)
+  }
   dir.create(path, recursive = TRUE, showWarnings = FALSE)
   file.path(path, ...)
 }
@@ -48,18 +78,31 @@ ravel_session_cache <- function() {
 
 ravel_runtime_state <- function() {
   if (is.null(ravel_state_env$runtime)) {
-    ravel_state_env$runtime <- list(
-      console_log = character(),
-      chat_history = list(),
-      pending_actions = list()
-    )
+    ravel_state_env$runtime <- ravel_default_runtime_state()
+  } else {
+    ravel_state_env$runtime <- ravel_merge_runtime_state(ravel_state_env$runtime)
   }
   ravel_state_env$runtime
 }
 
 ravel_set_runtime_state <- function(state) {
-  ravel_state_env$runtime <- state
-  invisible(state)
+  merged <- ravel_merge_runtime_state(state %||% list())
+  ravel_state_env$runtime <- merged
+  invisible(merged)
+}
+
+ravel_execution_environment <- function(parent = globalenv(), reset = FALSE) {
+  state <- ravel_runtime_state()
+  needs_reset <- isTRUE(reset) ||
+    !is.environment(state$execution_env) ||
+    !identical(parent.env(state$execution_env), parent)
+
+  if (needs_reset) {
+    state$execution_env <- new.env(parent = parent)
+    ravel_set_runtime_state(state)
+  }
+
+  state$execution_env
 }
 
 ravel_trim_text <- function(x, max_chars = 4000L) {
