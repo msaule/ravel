@@ -1,5 +1,6 @@
 # ravel 0.1.1
 
+- Published on CRAN, so `install.packages("ravel")` now works for the stable release.
 - Tightened install guidance with a resilient `pak`-first quick start.
 - Added a release-assets GitHub Actions workflow so tagged releases upload source tarballs automatically.
 - Simplified the root license files so the repository presents a canonical MIT license.

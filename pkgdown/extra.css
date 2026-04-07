@@ -95,6 +95,70 @@ body {
   margin-bottom: 1.8rem;
 }
 
+.ravel-actions {
+  margin: 0 auto 2rem;
+}
+
+.ravel-actions a {
+  display: inline-block;
+  margin: 0.35rem 0.35rem 0;
+  padding: 0.78rem 1.15rem;
+  border-radius: 999px;
+  border: 1px solid rgba(41, 84, 82, 0.14);
+  background: rgba(255, 252, 246, 0.96);
+  color: var(--ravel-teal);
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 10px 26px rgba(48, 39, 26, 0.08);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+
+.ravel-actions a:hover,
+.ravel-actions a:focus {
+  transform: translateY(-1px);
+  background: #fff;
+  box-shadow: 0 16px 30px rgba(48, 39, 26, 0.12);
+  color: #173635;
+}
+
+.ravel-home-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 2rem 0 2.4rem;
+}
+
+.ravel-home-card,
+.ravel-install-card {
+  padding: 1.2rem 1.25rem;
+  background: rgba(255, 252, 246, 0.96);
+  border: 1px solid rgba(41, 84, 82, 0.08);
+  border-radius: 22px;
+  box-shadow: 0 18px 34px rgba(60, 46, 30, 0.08);
+}
+
+.ravel-home-card h3,
+.ravel-install-card h3 {
+  margin-top: 0;
+  margin-bottom: 0.55rem;
+}
+
+.ravel-home-card p,
+.ravel-install-card p {
+  margin-bottom: 0;
+}
+
+.ravel-install-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1rem 0 2.1rem;
+}
+
+.ravel-install-card pre {
+  margin-bottom: 0;
+}
+
 .template-home h2 {
   margin-top: 2.8rem;
   margin-bottom: 0.9rem;
@@ -173,5 +237,10 @@ body {
   .ravel-tagline {
     text-align: left;
     font-size: 1rem;
+  }
+
+  .ravel-home-grid,
+  .ravel-install-grid {
+    grid-template-columns: 1fr;
   }
 }

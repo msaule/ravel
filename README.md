@@ -5,22 +5,53 @@
 <h1 align="center">Ravel</h1>
 
 <p align="center" class="ravel-tagline">
-  <strong>R-first AI copilot for RStudio and Posit workflows.</strong><br />
+  <strong>CRAN package for an R-first AI copilot in RStudio and Posit workflows.</strong><br />
   Context-aware code help, model interpretation, safe execution, and Quarto drafting.
 </p>
 
 <p align="center" class="ravel-badges">
+  <a href="https://cran.r-project.org/package=ravel"><img src="https://www.r-pkg.org/badges/version/ravel" alt="CRAN version" /></a>
   <a href="https://github.com/msaule/ravel/actions/workflows/R-CMD-check.yaml"><img src="https://github.com/msaule/ravel/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check" /></a>
-  <a href="https://github.com/msaule/ravel/releases"><img src="https://img.shields.io/github/v/release/msaule/ravel?display_name=tag" alt="Release" /></a>
+  <a href="https://cran.r-project.org/package=ravel"><img src="https://img.shields.io/badge/install-CRAN-276DC3" alt="Install from CRAN" /></a>
   <a href="https://github.com/msaule/ravel/blob/main/LICENSE.txt"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License: MIT" /></a>
   <a href="https://github.com/msaule/ravel"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental" /></a>
   <a href="https://msaule.github.io/ravel/"><img src="https://img.shields.io/badge/docs-pkgdown-2c5f5d.svg" alt="Docs" /></a>
 </p>
 
+<p align="center" class="ravel-actions">
+  <a href="https://cran.r-project.org/package=ravel">Install from CRAN</a>
+  <a href="https://msaule.github.io/ravel/">Package website</a>
+  <a href="https://msaule.github.io/ravel/reference/">Reference</a>
+  <a href="https://github.com/msaule/ravel/issues">Issues</a>
+</p>
+
 Ravel is not just chat inside an IDE. It is designed to behave like an analysis copilot for R users: it understands the active script, selected code, loaded objects, model outputs, git changes, and reproducible reporting workflows so it can help with real RStudio work instead of acting like a generic web chatbot.
 
-## Install now
+<div class="ravel-home-grid">
+<div class="ravel-home-card">
+<h3>Sees real R context</h3>
+<p>Understands the active editor, selected code, loaded objects, session state, plots, project files, and recent git changes.</p>
+</div>
+<div class="ravel-home-card">
+<h3>Built for statistical work</h3>
+<p>Explains lm() and glm() results, coefficients, interactions, diagnostics, model tradeoffs, and Quarto-ready reporting.</p>
+</div>
+<div class="ravel-home-card">
+<h3>Acts safely</h3>
+<p>Stages code and file changes, requires approval by default, and keeps an auditable action history.</p>
+</div>
+</div>
 
+## Install
+
+**Stable release from CRAN**
+```r
+install.packages("ravel")
+library(ravel)
+ravel::ravel_setup_addin()
+```
+
+**Development version from GitHub**
 ```r
 if (!requireNamespace("pak", quietly = TRUE)) install.packages("pak")
 pak::pak("msaule/ravel")
@@ -28,7 +59,11 @@ library(ravel)
 ravel::ravel_setup_addin()
 ```
 
-> GitHub install works today. A standard `install.packages("ravel")` flow will be available once CRAN publishes the package.
+## Start in 60 seconds
+
+1. Install `ravel` from CRAN.
+2. Run `ravel::ravel_setup_addin()` to connect at least one provider.
+3. Run `ravel::ravel_chat_addin()` in RStudio to open the chat UI.
 
 ## Why it feels different
 
@@ -38,13 +73,22 @@ ravel::ravel_setup_addin()
 - **Designed for RStudio.** The setup flow, chat UI, and action workflow live inside RStudio addins rather than treating R as a thin wrapper around a generic chat window.
 - **Multi-provider without pretending.** Ravel supports official APIs and official CLIs only, with clear messaging when a provider or auth path is unavailable.
 
-## What works today
+## What Ravel sees right away
 
-- RStudio addins for setup and chat
-- Provider adapters for OpenAI, GitHub Copilot CLI, Gemini, and Anthropic
-- Active-editor, selection, object, session, console, plot, project, and git-aware context
-- Statistical helpers for model summaries, coefficients, diagnostics, and Quarto drafting
-- Code preview, approval, execution, file staging, and action history logging
+- Active editor contents and selected code
+- Loaded objects, including data frames, formulas, and fitted models
+- Ravel-managed console output and current session details
+- Project files, working directory, and package context
+- Workspace and editor git state, including recent diffs
+
+## What it helps with
+
+- Explain selected R code and debugging errors
+- Interpret model summaries, coefficients, interactions, and diagnostics
+- Compare modeling choices and suggest next checks
+- Refactor tidyverse and base R code in either direction
+- Draft Quarto methods, results, and diagnostics sections
+- Preview code and file actions before applying them
 
 ## Provider support
 
@@ -58,32 +102,7 @@ Ravel is explicit about what is supported today and what is still constrained by
 | Gemini | Implemented for API key, OAuth-ready abstraction | API key, bearer token/OAuth-style token slot | API-key flow is implemented. OAuth is represented in the auth abstraction so the provider boundary stays clean. |
 | Anthropic | Implemented | API key | Official API-key auth only. No consumer-login mode is claimed. |
 
-## First-run setup
-
-1. Install and load `ravel`.
-2. Run the setup assistant:
-   ```r
-   ravel::ravel_setup_addin()
-   ```
-3. Sign in or save a key for at least one provider.
-4. Verify the provider from the setup panel.
-5. Open chat:
-   ```r
-   ravel::ravel_chat_addin()
-   ```
-
-## What you can ask Ravel to do
-
-- Ask questions about selected R code
-- Explain an error, warning, or traceback
-- Interpret model summaries, coefficients, and interactions
-- Suggest diagnostics and next modeling steps
-- Summarize loaded data frames and model objects
-- Draft Quarto results, methods, and diagnostics sections
-- Refactor tidyverse code to base R or the reverse
-- Propose code and stage it before execution or insertion
-
-## Safety and trust
+## Safety defaults
 
 - No silent code execution by default
 - No silent file edits by default
@@ -96,8 +115,9 @@ Non-sensitive settings and history stay in session memory by default, so Ravel
 does not write into a user's home filespace unless storage paths are configured
 explicitly through `options(ravel.user_dirs = list(config = "<path>", data = "<path>"))`.
 
-## Documentation and project guide
+## Learn more
 
+- CRAN package page: <https://cran.r-project.org/package=ravel>
 - Package website: <https://msaule.github.io/ravel/>
 - [ARCHITECTURE.md](ARCHITECTURE.md) explains the layers and execution model.
 - [ROADMAP.md](ROADMAP.md) lays out the planned phases beyond the MVP.
