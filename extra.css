@@ -1,0 +1,357 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Manrope:wght@400;500;600;700;800&display=swap");
+
+:root {
+  --ravel-ink: #1f2a27;
+  --ravel-muted: #5f645e;
+  --ravel-panel: #fffdf9;
+  --ravel-cream: #fbf6ee;
+  --ravel-border: rgba(58, 79, 74, 0.14);
+  --ravel-shadow: 0 24px 60px rgba(87, 69, 45, 0.12);
+  --ravel-teal: #295452;
+  --ravel-clay: #8c4f2d;
+  --ravel-deep: #173635;
+}
+
+body {
+  font-family: "Manrope", "Segoe UI", sans-serif;
+  color: var(--ravel-ink);
+  background-color: #fcfaf6;
+  background-image:
+    radial-gradient(circle at top center, rgba(214, 190, 156, 0.16) 0, rgba(214, 190, 156, 0.08) 18%, rgba(214, 190, 156, 0) 48%);
+  background-repeat: no-repeat;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Fraunces", Georgia, serif;
+}
+
+.navbar,
+.navbar.bg-light,
+.navbar.bg-primary {
+  background: linear-gradient(90deg, #244b4a 0%, #2d6260 58%, #7f563a 100%) !important;
+  box-shadow: 0 12px 30px rgba(25, 31, 29, 0.12);
+}
+
+.navbar .navbar-brand,
+.navbar .nav-link {
+  font-weight: 600;
+  color: #f7f3ec !important;
+}
+
+.navbar .nav-text,
+.navbar .navbar-toggler {
+  color: rgba(247, 243, 236, 0.86) !important;
+}
+
+.navbar .navbar-toggler {
+  border-color: rgba(247, 243, 236, 0.28);
+}
+
+.navbar .dropdown-menu {
+  border: 1px solid rgba(36, 75, 74, 0.12);
+  box-shadow: 0 18px 36px rgba(30, 36, 35, 0.12);
+}
+
+.navbar .dropdown-item {
+  font-weight: 500;
+}
+
+.template-home {
+  padding-top: 2rem;
+}
+
+.template-home .row {
+  justify-content: center;
+}
+
+.template-home main.col-md-9 {
+  flex: 0 0 100%;
+  max-width: 100%;
+}
+
+.template-home .page-header {
+  border-bottom: 0;
+  margin-bottom: 0.4rem;
+}
+
+.template-home .page-header h1 {
+  margin-top: 0.15rem;
+  margin-bottom: 0.75rem;
+  color: var(--ravel-ink);
+  font-size: clamp(2.7rem, 4vw, 4.8rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-align: center;
+}
+
+.ravel-hero-image {
+  margin-bottom: 1.1rem;
+}
+
+.ravel-hero-image img {
+  border-radius: 28px;
+  border: 1px solid var(--ravel-border);
+  box-shadow: var(--ravel-shadow);
+  background: var(--ravel-cream);
+}
+
+.ravel-tagline {
+  margin: 0 auto 1.45rem;
+  max-width: 920px;
+  color: var(--ravel-muted);
+  font-size: 1.22rem;
+  line-height: 1.75;
+  text-wrap: balance;
+}
+
+.ravel-tagline strong {
+  color: var(--ravel-ink);
+  font-size: 1.42rem;
+}
+
+.ravel-badges {
+  margin-bottom: 1.8rem;
+}
+
+.ravel-actions {
+  margin: 0 auto 2rem;
+}
+
+.ravel-actions a {
+  display: inline-block;
+  margin: 0.35rem 0.35rem 0;
+  padding: 0.78rem 1.15rem;
+  border-radius: 999px;
+  border: 1px solid rgba(41, 84, 82, 0.14);
+  background: rgba(255, 252, 246, 0.96);
+  color: var(--ravel-teal);
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 10px 26px rgba(48, 39, 26, 0.08);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+
+.ravel-actions a:hover,
+.ravel-actions a:focus {
+  transform: translateY(-1px);
+  background: #fff;
+  box-shadow: 0 16px 30px rgba(48, 39, 26, 0.12);
+  color: #173635;
+}
+
+.ravel-home-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1.7rem 0 1.5rem;
+}
+
+.ravel-home-card,
+.ravel-install-card {
+  padding: 1.2rem 1.25rem;
+  background: rgba(255, 252, 246, 0.96);
+  border: 1px solid rgba(41, 84, 82, 0.08);
+  border-radius: 22px;
+  box-shadow: 0 18px 34px rgba(60, 46, 30, 0.08);
+}
+
+.ravel-home-card h3,
+.ravel-install-card h3 {
+  margin-top: 0;
+  margin-bottom: 0.55rem;
+}
+
+.ravel-home-card p,
+.ravel-install-card p {
+  margin-bottom: 0;
+}
+
+.ravel-signal-strip {
+  margin: 0.25rem 0 2.6rem;
+}
+
+.ravel-signal-strip p {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  justify-content: center;
+  margin: 0;
+}
+
+.ravel-signal-strip span {
+  padding: 0.55rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(34, 72, 70, 0.08);
+  border: 1px solid rgba(34, 72, 70, 0.08);
+  color: var(--ravel-deep);
+  font-size: 0.94rem;
+  font-weight: 700;
+}
+
+.ravel-install-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1rem 0 2.1rem;
+}
+
+.ravel-install-card pre {
+  margin-bottom: 0;
+}
+
+.ravel-showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.1rem;
+  margin: 1.4rem 0 0.6rem;
+}
+
+.ravel-showcase-card {
+  padding: 1.4rem;
+  border-radius: 24px;
+  border: 1px solid rgba(38, 70, 68, 0.1);
+  background:
+    linear-gradient(180deg, rgba(255, 252, 246, 0.98) 0%, rgba(250, 245, 238, 0.98) 100%);
+  box-shadow: 0 20px 34px rgba(49, 39, 29, 0.08);
+}
+
+.ravel-showcase-kicker {
+  margin-bottom: 0.6rem;
+  color: var(--ravel-teal);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ravel-showcase-card h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  color: var(--ravel-deep);
+  font-size: 1.35rem;
+}
+
+.ravel-showcase-card p {
+  margin-bottom: 0.75rem;
+}
+
+.ravel-showcase-card pre {
+  margin: 0.9rem 0;
+  border-radius: 20px;
+  background: #173635;
+  color: #f7f6f0;
+}
+
+.ravel-showcase-card pre code {
+  color: inherit;
+  font-size: 0.95rem;
+}
+
+.ravel-showcase-result {
+  margin-top: 0.95rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(38, 70, 68, 0.1);
+  color: var(--ravel-clay);
+  font-weight: 700;
+}
+
+.template-home h2 {
+  margin-top: 3.1rem;
+  margin-bottom: 0.95rem;
+  color: var(--ravel-teal);
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  font-size: clamp(1.8rem, 2.6vw, 2.5rem);
+}
+
+.template-home h3 {
+  color: var(--ravel-clay);
+  font-weight: 700;
+}
+
+.template-home p,
+.template-home li {
+  font-size: 1.02rem;
+  line-height: 1.75;
+}
+
+.template-home ul,
+.template-home ol {
+  margin-bottom: 1.2rem;
+}
+
+.template-home blockquote {
+  margin: 1.4rem 0 0;
+  padding: 1rem 1.2rem;
+  border-left: 4px solid rgba(41, 84, 82, 0.35);
+  background: rgba(255, 250, 243, 0.95);
+  border-radius: 16px;
+  color: var(--ravel-ink);
+}
+
+.template-home .sourceCode,
+.template-home pre {
+  border-radius: 18px;
+}
+
+.template-home pre {
+  border: 1px solid rgba(63, 82, 76, 0.08);
+  box-shadow: 0 16px 34px rgba(50, 41, 28, 0.08);
+}
+
+.template-home table {
+  background: var(--ravel-panel);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 16px 38px rgba(60, 46, 30, 0.08);
+}
+
+.template-home table thead {
+  background: rgba(41, 84, 82, 0.08);
+}
+
+.template-home table th {
+  color: var(--ravel-ink);
+  font-weight: 700;
+}
+
+.template-home table td,
+.template-home table th {
+  border-color: rgba(41, 84, 82, 0.08);
+  vertical-align: top;
+}
+
+@media (max-width: 767.98px) {
+  .template-home {
+    padding-top: 1rem;
+  }
+
+  .template-home .page-header h1 {
+    text-align: left;
+    font-size: 2.25rem;
+  }
+
+  .ravel-tagline {
+    text-align: left;
+    font-size: 1rem;
+  }
+
+  .ravel-home-grid,
+  .ravel-install-grid,
+  .ravel-showcase-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ravel-signal-strip {
+    margin-bottom: 2rem;
+  }
+
+  .ravel-signal-strip p {
+    justify-content: flex-start;
+  }
+}
