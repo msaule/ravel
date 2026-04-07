@@ -5,8 +5,8 @@
 <h1 align="center">Ravel</h1>
 
 <p align="center" class="ravel-tagline">
-  <strong>CRAN package for an R-first AI copilot in RStudio and Posit workflows.</strong><br />
-  Context-aware code help, model interpretation, safe execution, and Quarto drafting.
+  <strong>RStudio-native AI copilot for serious R analysis.</strong><br />
+  It sees your code, models, objects, git changes, and reporting workflow, then helps like an analyst instead of a generic chatbot.
 </p>
 
 <p align="center" class="ravel-badges">
@@ -42,6 +42,17 @@ Ravel is not just chat inside an IDE. It is designed to behave like an analysis 
 </div>
 </div>
 
+<div class="ravel-signal-strip">
+<span>Active editor</span>
+<span>Selected code</span>
+<span>Loaded models</span>
+<span>Data frames</span>
+<span>Console state</span>
+<span>Git diffs</span>
+<span>Quarto drafting</span>
+<span>Safe execution</span>
+</div>
+
 ## Install
 
 **Stable release from CRAN**
@@ -73,6 +84,68 @@ ravel::ravel_setup_addin()
 - **Designed for RStudio.** The setup flow, chat UI, and action workflow live inside RStudio addins rather than treating R as a thin wrapper around a generic chat window.
 - **Multi-provider without pretending.** Ravel supports official APIs and official CLIs only, with clear messaging when a provider or auth path is unavailable.
 
+## Showcase workflows
+
+These are the kinds of prompts where Ravel starts feeling very different from a normal chat window.
+
+<div class="ravel-showcase-grid">
+<div class="ravel-showcase-card">
+<div class="ravel-showcase-kicker">Statistical debugging</div>
+<h3>Diagnose a weird glm() before you trust it</h3>
+<p>Ravel sees the selected model code, the fitted object in memory, and the latest console output.</p>
+<pre><code>Why do these logistic coefficients explode?
+Check whether separation is plausible,
+tell me what diagnostics to run next,
+and draft a Quarto diagnostics subsection.</code></pre>
+<p class="ravel-showcase-result">Useful when a model technically runs but the analysis feels wrong.</p>
+</div>
+<div class="ravel-showcase-card">
+<div class="ravel-showcase-kicker">Refactoring with context</div>
+<h3>Rewrite a gnarly tidyverse pipeline into base R</h3>
+<p>Ravel can use the active selection, nearby script context, and project files so the rewrite matches how the rest of the analysis is written.</p>
+<pre><code>Convert this dplyr pipeline to base R,
+keep the same output shape,
+and explain each transformation step.</code></pre>
+<p class="ravel-showcase-result">Good for teaching, package work, and mixed-style codebases.</p>
+</div>
+<div class="ravel-showcase-card">
+<div class="ravel-showcase-kicker">Results writing</div>
+<h3>Turn a fitted model into a report section</h3>
+<p>With a model object in memory, Ravel can help draft prose, interpretation, and chunk scaffolding that matches the current analysis.</p>
+<pre><code>Write a results section from this model,
+explain the interaction in plain English,
+and include a Quarto chunk for follow-up plots.</code></pre>
+<p class="ravel-showcase-result">Especially strong when you already have lm() or glm() objects loaded.</p>
+</div>
+<div class="ravel-showcase-card">
+<div class="ravel-showcase-kicker">Code review for analysts</div>
+<h3>Use git-aware context to review an analysis diff</h3>
+<p>Ravel reads the workspace git state and recent diffs, then helps reason about whether a change is cosmetic, risky, or statistically meaningful.</p>
+<pre><code>Summarize what changed in this analysis,
+tell me which edits could change results,
+and suggest a validation checklist before merge.</code></pre>
+<p class="ravel-showcase-result">Helpful when you want a reviewer that understands both code and analysis intent.</p>
+</div>
+<div class="ravel-showcase-card">
+<div class="ravel-showcase-kicker">Interpretation help</div>
+<h3>Explain factor levels and interactions without hand-waving</h3>
+<p>Ravel can inspect model summaries and object structure, then translate coefficient tables into plain language that is actually usable.</p>
+<pre><code>Explain these coefficients like I have to present them.
+What is the reference group?
+How does the interaction change the main-effect interpretation?</code></pre>
+<p class="ravel-showcase-result">Ideal for teaching, presentations, and cleaning up methods/results language.</p>
+</div>
+<div class="ravel-showcase-card">
+<div class="ravel-showcase-kicker">Analysis rescue</div>
+<h3>Recover from an ugly error with the real workspace in view</h3>
+<p>Instead of pasting fragments into a browser tab, you can keep the active script, objects, and recent output attached to the same conversation.</p>
+<pre><code>Why is this join failing right now?
+Use the selected code and loaded objects,
+then propose the smallest safe fix.</code></pre>
+<p class="ravel-showcase-result">This is where the RStudio-native workflow matters most.</p>
+</div>
+</div>
+
 ## What Ravel sees right away
 
 - Active editor contents and selected code
@@ -89,6 +162,14 @@ ravel::ravel_setup_addin()
 - Refactor tidyverse and base R code in either direction
 - Draft Quarto methods, results, and diagnostics sections
 - Preview code and file actions before applying them
+
+## Built for people doing real R work
+
+- Analysts working in RStudio on scripts, reports, and iterative modeling
+- Students learning how code, model output, and interpretation connect
+- Researchers writing Quarto or R Markdown from live analysis objects
+- Data science teams reviewing analytical changes, not just syntax
+- Anyone who wants safer execution than copy-pasting from a browser chatbot
 
 ## Provider support
 
@@ -119,6 +200,7 @@ explicitly through `options(ravel.user_dirs = list(config = "<path>", data = "<p
 
 - CRAN package page: <https://cran.r-project.org/package=ravel>
 - Package website: <https://msaule.github.io/ravel/>
+- Showcase article: <https://msaule.github.io/ravel/articles/ravel-showcase.html>
 - [ARCHITECTURE.md](ARCHITECTURE.md) explains the layers and execution model.
 - [ROADMAP.md](ROADMAP.md) lays out the planned phases beyond the MVP.
 - [CONTRIBUTING.md](CONTRIBUTING.md) explains the developer workflow and release checks.

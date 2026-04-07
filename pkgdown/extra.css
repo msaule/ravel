@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Manrope:wght@400;500;600;700;800&display=swap");
+
 :root {
   --ravel-ink: #1f2a27;
   --ravel-muted: #5f645e;
@@ -7,14 +9,25 @@
   --ravel-shadow: 0 24px 60px rgba(87, 69, 45, 0.12);
   --ravel-teal: #295452;
   --ravel-clay: #8c4f2d;
+  --ravel-deep: #173635;
 }
 
 body {
+  font-family: "Manrope", "Segoe UI", sans-serif;
   color: var(--ravel-ink);
   background-color: #fcfaf6;
   background-image:
     radial-gradient(circle at top center, rgba(214, 190, 156, 0.16) 0, rgba(214, 190, 156, 0.08) 18%, rgba(214, 190, 156, 0) 48%);
   background-repeat: no-repeat;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Fraunces", Georgia, serif;
 }
 
 .navbar,
@@ -52,23 +65,32 @@ body {
   padding-top: 2rem;
 }
 
+.template-home .row {
+  justify-content: center;
+}
+
+.template-home main.col-md-9 {
+  flex: 0 0 100%;
+  max-width: 100%;
+}
+
 .template-home .page-header {
   border-bottom: 0;
-  margin-bottom: 1rem;
+  margin-bottom: 0.4rem;
 }
 
 .template-home .page-header h1 {
-  margin-top: 0.4rem;
+  margin-top: 0.15rem;
   margin-bottom: 0.75rem;
   color: var(--ravel-ink);
-  font-size: clamp(2.4rem, 3vw, 4rem);
+  font-size: clamp(2.7rem, 4vw, 4.8rem);
   font-weight: 800;
   letter-spacing: -0.03em;
   text-align: center;
 }
 
 .ravel-hero-image {
-  margin-bottom: 1.75rem;
+  margin-bottom: 1.1rem;
 }
 
 .ravel-hero-image img {
@@ -79,16 +101,17 @@ body {
 }
 
 .ravel-tagline {
-  margin: 0 auto 1.25rem;
-  max-width: 780px;
+  margin: 0 auto 1.45rem;
+  max-width: 920px;
   color: var(--ravel-muted);
-  font-size: 1.14rem;
-  line-height: 1.7;
+  font-size: 1.22rem;
+  line-height: 1.75;
+  text-wrap: balance;
 }
 
 .ravel-tagline strong {
   color: var(--ravel-ink);
-  font-size: 1.24rem;
+  font-size: 1.42rem;
 }
 
 .ravel-badges {
@@ -125,7 +148,7 @@ body {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
-  margin: 2rem 0 2.4rem;
+  margin: 1.7rem 0 1.5rem;
 }
 
 .ravel-home-card,
@@ -148,6 +171,28 @@ body {
   margin-bottom: 0;
 }
 
+.ravel-signal-strip {
+  margin: 0.25rem 0 2.6rem;
+}
+
+.ravel-signal-strip p {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  justify-content: center;
+  margin: 0;
+}
+
+.ravel-signal-strip span {
+  padding: 0.55rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(34, 72, 70, 0.08);
+  border: 1px solid rgba(34, 72, 70, 0.08);
+  color: var(--ravel-deep);
+  font-size: 0.94rem;
+  font-weight: 700;
+}
+
 .ravel-install-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -159,12 +204,69 @@ body {
   margin-bottom: 0;
 }
 
+.ravel-showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.1rem;
+  margin: 1.4rem 0 0.6rem;
+}
+
+.ravel-showcase-card {
+  padding: 1.4rem;
+  border-radius: 24px;
+  border: 1px solid rgba(38, 70, 68, 0.1);
+  background:
+    linear-gradient(180deg, rgba(255, 252, 246, 0.98) 0%, rgba(250, 245, 238, 0.98) 100%);
+  box-shadow: 0 20px 34px rgba(49, 39, 29, 0.08);
+}
+
+.ravel-showcase-kicker {
+  margin-bottom: 0.6rem;
+  color: var(--ravel-teal);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ravel-showcase-card h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  color: var(--ravel-deep);
+  font-size: 1.35rem;
+}
+
+.ravel-showcase-card p {
+  margin-bottom: 0.75rem;
+}
+
+.ravel-showcase-card pre {
+  margin: 0.9rem 0;
+  border-radius: 20px;
+  background: #173635;
+  color: #f7f6f0;
+}
+
+.ravel-showcase-card pre code {
+  color: inherit;
+  font-size: 0.95rem;
+}
+
+.ravel-showcase-result {
+  margin-top: 0.95rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(38, 70, 68, 0.1);
+  color: var(--ravel-clay);
+  font-weight: 700;
+}
+
 .template-home h2 {
-  margin-top: 2.8rem;
-  margin-bottom: 0.9rem;
+  margin-top: 3.1rem;
+  margin-bottom: 0.95rem;
   color: var(--ravel-teal);
   font-weight: 750;
   letter-spacing: -0.02em;
+  font-size: clamp(1.8rem, 2.6vw, 2.5rem);
 }
 
 .template-home h3 {
@@ -240,7 +342,16 @@ body {
   }
 
   .ravel-home-grid,
-  .ravel-install-grid {
+  .ravel-install-grid,
+  .ravel-showcase-grid {
     grid-template-columns: 1fr;
+  }
+
+  .ravel-signal-strip {
+    margin-bottom: 2rem;
+  }
+
+  .ravel-signal-strip p {
+    justify-content: flex-start;
   }
 }

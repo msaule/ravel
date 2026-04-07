@@ -1,0 +1,157 @@
+---
+title: "Ravel Showcase Workflows"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Ravel Showcase Workflows}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Why this package exists
+
+Ravel is meant to feel closer to an analysis copilot than a generic chat box.
+The point is not just to answer a question about R syntax. The point is to
+reason with the current script, the selected code, the loaded objects, the
+models already in memory, the surrounding project, and the reporting workflow.
+
+# Workflow 1: diagnose a model that technically runs but feels wrong
+
+Imagine you just fit a model and the output looks suspicious. Coefficients are
+huge, standard errors are unstable, or the interaction terms are hard to
+explain.
+
+```{r}
+fit <- lm(mpg ~ wt * am, data = mtcars)
+ravel::ravel_summarize_model(fit)
+```
+
+Ravel is designed for prompts like:
+
+> Explain this model in plain English, tell me how the interaction changes the
+> interpretation of the main effects, and list the next diagnostics I should
+> run before I trust it.
+
+```{r}
+cat(ravel::ravel_interpret_model(fit))
+```
+
+```{r}
+ravel::ravel_suggest_diagnostics(fit)
+```
+
+# Workflow 2: turn analysis output into Quarto writing
+
+Once you already have a fitted object, the next bottleneck is often writing.
+Ravel can help scaffold methods, results, and diagnostics sections without
+leaving the IDE.
+
+```{r}
+cat(ravel::ravel_draft_quarto_section("results", model = fit))
+```
+
+For a more diagnostics-heavy turn:
+
+> Draft a Quarto diagnostics section for this model, summarize the main caveats,
+> and include a chunk for the checks I should run next.
+
+```{r}
+cat(ravel::ravel_draft_quarto_section("diagnostics", model = fit))
+```
+
+# Workflow 3: ask for a safe code change instead of blindly running it
+
+Ravel stages actions before execution, which matters for analysis work where a
+small change can silently alter results.
+
+```{r}
+action <- ravel::ravel_preview_code("
+summary(mtcars$mpg)
+quantile(mtcars$mpg)
+")
+action$label
+```
+
+You can then approve and run it explicitly:
+
+```{r}
+approved <- ravel::ravel_approve_action(action)
+ravel::ravel_run_code(approved)
+```
+
+# Workflow 4: use object-aware context instead of re-explaining everything
+
+When Ravel inspects the current session, it can summarize data frames, models,
+formulas, and other objects directly.
+
+```{r}
+analysis_objects <- list(
+  data = mtcars,
+  formula = mpg ~ wt * am,
+  model = fit
+)
+
+lapply(analysis_objects, ravel::ravel_summarize_object)
+```
+
+This enables prompts like:
+
+> Summarize the objects I have loaded, tell me which one looks like the main
+> modeling artifact, and propose the next analysis step.
+
+# Workflow 5: review analytical code, not just syntax
+
+Ravel is also designed for prompts that depend on the active editor and
+project-level context:
+
+> Use the selected code and the current project context to tell me whether this
+> refactor changes results or just changes style.
+
+> Summarize the latest analysis diff and tell me what I should validate before
+> I merge it.
+
+> Convert this selected tidyverse pipeline to base R, but keep it readable and
+> consistent with the rest of the file.
+
+These are exactly the kinds of tasks where a project-aware assistant feels
+different from a plain browser chat.
+
+# Workflow 6: start inside RStudio
+
+The intended flow is:
+
+```r
+install.packages("ravel")
+library(ravel)
+ravel::ravel_setup_addin()
+ravel::ravel_chat_addin()
+```
+
+Once the addin is open, Ravel can answer questions like:
+
+- Why did this join fail with the currently loaded objects?
+- Explain these coefficients as if I had to present them.
+- Draft a results paragraph from the model I just fit.
+- Suggest diagnostics for this glm() before I report it.
+- Turn this selected code into a safer, simpler version.
+
+# What the package is aiming for
+
+The long-term goal is not to mimic a chat website inside RStudio. It is to make
+RStudio feel like it has an analysis-aware copilot that understands:
+
+- code
+- context
+- models
+- diagnostics
+- git state
+- reproducible writing
+- safe execution
+
+That is the difference Ravel is trying to push.

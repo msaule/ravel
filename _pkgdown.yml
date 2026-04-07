@@ -7,16 +7,19 @@ url: https://msaule.github.io/ravel
 
 home:
   title: Ravel
-  description: CRAN package for an R-first AI copilot in RStudio and Posit workflows.
+  description: RStudio-native AI copilot for serious R analysis.
 
 navbar:
   structure:
-    left: [intro, reference, articles, news]
+    left: [intro, showcase, reference, articles, news]
     right: [cran, github]
   components:
     intro:
       text: Home
       href: index.html
+    showcase:
+      text: Showcase
+      href: articles/ravel-showcase.html
     cran:
       text: CRAN
       href: https://cran.r-project.org/package=ravel
