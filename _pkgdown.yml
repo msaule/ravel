@@ -46,6 +46,8 @@ reference:
       - ravel_list_project_files
       - ravel_list_providers
       - ravel_provider_capabilities
+      - ravel_mcp_tool
+      - ravel_mcp_tools
       - ravel_read_history
   - title: Auth and settings
     contents:

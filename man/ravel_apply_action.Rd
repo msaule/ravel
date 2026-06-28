@@ -4,7 +4,12 @@
 \alias{ravel_apply_action}
 \title{Execute a staged action}
 \usage{
-ravel_apply_action(action, approve = FALSE, envir = NULL)
+ravel_apply_action(
+  action,
+  approve = FALSE,
+  envir = NULL,
+  allow_outside_project = FALSE
+)
 }
 \arguments{
 \item{action}{A \code{ravel_action}.}
@@ -14,6 +19,9 @@ ravel_apply_action(action, approve = FALSE, envir = NULL)
 \item{envir}{Evaluation environment for code execution. When \code{NULL},
 Ravel uses a dedicated session-scoped environment that inherits from
 \code{globalenv()} for reads without writing into \code{.GlobalEnv} by default.}
+
+\item{allow_outside_project}{Whether approved file actions may write outside
+the detected project root. The default is \code{FALSE}.}
 }
 \value{
 A structured result list.

@@ -4,7 +4,12 @@
 \alias{ravel_run_code}
 \title{Run R code with explicit approval semantics}
 \usage{
-ravel_run_code(action, approve = FALSE, envir = NULL)
+ravel_run_code(
+  action,
+  approve = FALSE,
+  envir = NULL,
+  allow_outside_project = FALSE
+)
 }
 \arguments{
 \item{action}{Either a \code{ravel_action} or a character string of R code.}
@@ -13,6 +18,9 @@ ravel_run_code(action, approve = FALSE, envir = NULL)
 
 \item{envir}{Evaluation environment. When \code{NULL}, code runs in Ravel's
 dedicated session-scoped execution environment instead of \code{.GlobalEnv}.}
+
+\item{allow_outside_project}{Whether approved file actions may write outside
+the detected project root. Ignored for character R code.}
 }
 \value{
 A structured result list.

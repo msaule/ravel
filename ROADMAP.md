@@ -49,3 +49,10 @@
 - Safer multi-step plans with approval checkpoints
 - Reproducible reporting pipelines
 - Model comparison workflows with explicit diagnostics
+
+## Phase 7: MCP and tool ecosystems
+
+- Optional R-native MCP server/client support through `mcptools`
+- Remote MCP tool configuration for providers that support it officially
+- Provider capability discovery for hosted tools, MCP tools, and approval policies
+- Ravel tool export surface for context summaries, model summaries, staged edits, and Quarto drafting

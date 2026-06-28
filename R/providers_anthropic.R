@@ -1,5 +1,11 @@
 ravel_anthropic_models <- function() {
-  c("claude-sonnet-4-20250514", "claude-opus-4-1-20250805")
+  c(
+    "claude-sonnet-4-6",
+    "claude-opus-4-8",
+    "claude-haiku-4-5-20251001",
+    "claude-sonnet-4-20250514",
+    "claude-opus-4-1-20250805"
+  )
 }
 
 ravel_anthropic_chat <- function(messages, context, model, settings) {
@@ -51,7 +57,7 @@ ravel_provider_anthropic <- function() {
     name = "anthropic",
     label = "Anthropic",
     auth_modes = c("api_key"),
-    default_model = ravel_read_settings()$default_models$anthropic %||% "claude-sonnet-4-20250514",
+    default_model = ravel_read_settings()$default_models$anthropic %||% "claude-sonnet-4-6",
     models = ravel_anthropic_models(),
     capabilities = list(
       code_generation = TRUE,

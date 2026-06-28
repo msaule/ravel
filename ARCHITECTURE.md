@@ -35,11 +35,13 @@ Files:
 
 - `R/provider_interface.R`
 - `R/history.R`
+- `R/mcp.R`
 
 Responsibilities:
 
 - normalize provider discovery
 - build message payloads from chat + context
+- normalize optional MCP tool declarations for provider payloads
 - store chat history and action records
 - turn provider responses into user-visible messages and staged actions
 
@@ -164,6 +166,23 @@ Actions move through:
 5. logged
 
 Nothing is auto-applied by default in the MVP.
+
+Ravel's safety model is approval-gated and auditable, not an operating-system
+sandbox. R code runs in a session-scoped environment by default so assignments
+do not modify `.GlobalEnv` unless an environment is supplied explicitly. File
+actions are blocked outside the detected project root by default, even after
+approval, unless the caller explicitly allows the outside-project target.
+
+## MCP model
+
+MCP support is optional and provider-capability driven:
+
+- OpenAI API-key mode can attach remote MCP tool declarations through the
+  Responses API when the user configures `openai_mcp_tools`.
+- R-native MCP support is planned through the optional `mcptools` package when
+  available, but it is not required at package load or check time.
+- MCP tool calls should preserve Ravel's safety defaults: approvals visible to
+  the user, compact context, and no silent file writes or code execution.
 
 ## Logging
 

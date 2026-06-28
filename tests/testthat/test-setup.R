@@ -20,6 +20,8 @@ test_that("provider verification reports success and failure clearly", {
       list(
         name = provider %||% "openai",
         default_model = "test-model",
+        models = "test-model",
+        label = "Test",
         chat = function(messages, context, model, settings) {
           list(content = "ravel_provider_ok", model = model)
         }
@@ -37,6 +39,8 @@ test_that("provider verification reports success and failure clearly", {
       list(
         name = provider %||% "openai",
         default_model = "test-model",
+        models = "test-model",
+        label = "Test",
         chat = function(messages, context, model, settings) {
           stop("authentication failed")
         }

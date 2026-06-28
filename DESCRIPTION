@@ -1,6 +1,6 @@
 Package: ravel
 Title: AI Copilot for R Analysis Workflows in 'RStudio'
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: 
     person("Markuss", "Saule", , "markusstomas@gmail.com", role = c("aut", "cre", "cph"))
 Description: An AI copilot for R users in 'RStudio' and Posit workflows with

@@ -21,3 +21,18 @@ test_that("approved code executes and captures output", {
   expect_equal(result$value, 2)
   expect_equal(env$x, 2)
 })
+
+test_that("approved file writes outside project are blocked by default", {
+  reset_ravel_test_state()
+  path <- file.path(tempdir(), "ravel-outside-project.txt")
+  action <- ravel_stage_file_write(path, "unsafe")
+  action <- ravel_approve_action(action)
+
+  expect_false(isTRUE(action$payload$safety$within_project))
+  expect_error(
+    ravel_apply_action(action),
+    "outside the detected project root",
+    fixed = TRUE
+  )
+  expect_false(file.exists(path))
+})

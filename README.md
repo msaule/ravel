@@ -38,7 +38,7 @@ Ravel is not just chat inside an IDE. It is designed to behave like an analysis 
 </div>
 <div class="ravel-home-card">
 <h3>Acts safely</h3>
-<p>Stages code and file changes, requires approval by default, and keeps an auditable action history.</p>
+<p>Stages code and file changes, requires approval by default, blocks outside-project file writes by default, and keeps an auditable action history.</p>
 </div>
 </div>
 
@@ -81,6 +81,7 @@ ravel::ravel_setup_addin()
 - **Context-aware by default.** Ravel gathers the active editor, selected code, workspace objects, console state captured through Ravel actions, project files, and recent git diffs before it responds.
 - **Built for statistical work.** It explains `lm()` and `glm()` results, coefficients, interactions, fit diagnostics, and common modeling pitfalls in plain English.
 - **Safe when it acts.** Generated code is previewed, file edits are staged, and actions are logged instead of silently executed.
+- **MCP-ready without forcing new dependencies.** Remote MCP tool declarations are available for providers that support them, while R-native MCP work stays optional through `mcptools`.
 - **Designed for RStudio.** The setup flow, chat UI, and action workflow live inside RStudio addins rather than treating R as a thin wrapper around a generic chat window.
 - **Multi-provider without pretending.** Ravel supports official APIs and official CLIs only, with clear messaging when a provider or auth path is unavailable.
 
@@ -183,14 +184,23 @@ Ravel is explicit about what is supported today and what is still constrained by
 | Gemini | Implemented for API key, OAuth-ready abstraction | API key, bearer token/OAuth-style token slot | API-key flow is implemented. OAuth is represented in the auth abstraction so the provider boundary stays clean. |
 | Anthropic | Implemented | API key | Official API-key auth only. No consumer-login mode is claimed. |
 
+OpenAI API-key mode uses the Responses API by default so Ravel can attach
+official remote MCP tool declarations when configured. The older chat
+completions path remains available as a compatibility mode through settings.
+
 ## Safety defaults
 
 - No silent code execution by default
 - No silent file edits by default
 - Explicit previews and approvals
+- Approved file writes outside the detected project root are blocked by default
 - Structured history for actions and conversations, stored in session memory by default
 - Honest provider and auth messaging
 - Statistical caveats when assumptions or limitations are visible
+
+Ravel's current sandboxing is deliberately honest: it provides approval-gated
+execution, a dedicated session-scoped R environment, path checks for file
+actions, and logs. It is not an operating-system or container sandbox.
 
 Non-sensitive settings and history stay in session memory by default, so Ravel
 does not write into a user's home filespace unless storage paths are configured
@@ -225,6 +235,7 @@ The auth and provider boundaries in this project follow official documentation:
 
 - OpenAI Codex CLI: <https://developers.openai.com/codex/cli>
 - OpenAI API auth: <https://developers.openai.com/api/reference/overview>
+- OpenAI Responses API remote MCP tools: <https://developers.openai.com/api/docs/guides/tools-remote-mcp>
 - GitHub CLI `gh copilot`: <https://cli.github.com/manual/gh_copilot>
 - Gemini API docs: <https://ai.google.dev/gemini-api/docs>
 - Anthropic API docs: <https://docs.anthropic.com/en/api>

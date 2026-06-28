@@ -51,10 +51,15 @@ ravel_capture_eval <- function(code, envir = NULL) {
 #' @param envir Evaluation environment for code execution. When `NULL`,
 #'   Ravel uses a dedicated session-scoped environment that inherits from
 #'   `globalenv()` for reads without writing into `.GlobalEnv` by default.
+#' @param allow_outside_project Whether approved file actions may write outside
+#'   the detected project root. The default is `FALSE`.
 #'
 #' @return A structured result list.
 #' @export
-ravel_apply_action <- function(action, approve = FALSE, envir = NULL) {
+ravel_apply_action <- function(action,
+                               approve = FALSE,
+                               envir = NULL,
+                               allow_outside_project = FALSE) {
   if (!inherits(action, "ravel_action")) {
     cli::cli_abort("`action` must inherit from `ravel_action`.")
   }
@@ -73,10 +78,12 @@ ravel_apply_action <- function(action, approve = FALSE, envir = NULL) {
     action$type,
     run_code = ravel_capture_eval(action$payload$code, envir = envir),
     write_file = {
+      ravel_assert_file_allowed(action, allow_outside_project = allow_outside_project)
       ravel_write_file_text(action$payload$path, action$payload$text, append = FALSE)
       list(success = TRUE, path = action$payload$path)
     },
     append_file = {
+      ravel_assert_file_allowed(action, allow_outside_project = allow_outside_project)
       ravel_write_file_text(action$payload$path, action$payload$text, append = TRUE)
       list(success = TRUE, path = action$payload$path)
     },
@@ -102,12 +109,22 @@ ravel_apply_action <- function(action, approve = FALSE, envir = NULL) {
 #' @param approve Whether to approve and run immediately.
 #' @param envir Evaluation environment. When `NULL`, code runs in Ravel's
 #'   dedicated session-scoped execution environment instead of `.GlobalEnv`.
+#' @param allow_outside_project Whether approved file actions may write outside
+#'   the detected project root. Ignored for character R code.
 #'
 #' @return A structured result list.
 #' @export
-ravel_run_code <- function(action, approve = FALSE, envir = NULL) {
+ravel_run_code <- function(action,
+                           approve = FALSE,
+                           envir = NULL,
+                           allow_outside_project = FALSE) {
   if (is.character(action)) {
     action <- ravel_preview_code(action)
   }
-  ravel_apply_action(action, approve = approve, envir = envir)
+  ravel_apply_action(
+    action,
+    approve = approve,
+    envir = envir,
+    allow_outside_project = allow_outside_project
+  )
 }

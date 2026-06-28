@@ -1,5 +1,11 @@
 ravel_gemini_models <- function() {
-  c("gemini-2.5-pro", "gemini-2.5-flash")
+  c(
+    "gemini-3.1-pro-preview",
+    "gemini-3.5-flash",
+    "gemini-3.1-flash-lite",
+    "gemini-2.5-pro",
+    "gemini-2.5-flash"
+  )
 }
 
 ravel_gemini_chat <- function(messages, context, model, settings) {
@@ -55,7 +61,7 @@ ravel_provider_gemini <- function() {
     name = "gemini",
     label = "Gemini",
     auth_modes = c("api_key", "oauth_token"),
-    default_model = ravel_read_settings()$default_models$gemini %||% "gemini-2.5-pro",
+    default_model = ravel_read_settings()$default_models$gemini %||% "gemini-3.1-pro-preview",
     models = ravel_gemini_models(),
     capabilities = list(
       code_generation = TRUE,

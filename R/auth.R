@@ -2,14 +2,18 @@ ravel_default_settings <- function() {
   list(
     default_provider = "openai",
     default_models = list(
-      openai = "gpt-5.3-codex",
-      gemini = "gemini-2.5-pro",
-      anthropic = "claude-sonnet-4-20250514",
+      openai = "gpt-5.5",
+      gemini = "gemini-3.1-pro-preview",
+      anthropic = "claude-sonnet-4-6",
       copilot = "copilot-cli"
     ),
     provider_auth_modes = list(
       openai = "auto"
     ),
+    provider_api_modes = list(
+      openai = "responses"
+    ),
+    openai_mcp_tools = list(),
     context_defaults = list(
       selection = TRUE,
       file = TRUE,

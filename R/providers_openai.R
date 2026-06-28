@@ -1,5 +1,5 @@
 ravel_openai_models <- function() {
-  c("gpt-5.3-codex", "gpt-5.4", "gpt-4.1")
+  c("gpt-5.5", "gpt-5.4", "gpt-5.3-codex", "gpt-4.1")
 }
 
 ravel_openai_extract_text <- function(content) {
@@ -19,12 +19,36 @@ ravel_openai_extract_text <- function(content) {
   as.character(content %||% "")
 }
 
-ravel_openai_api_chat <- function(messages, context, model) {
-  api_key <- ravel_get_secret("openai", "api_key")
-  if (is.null(api_key)) {
-    cli::cli_abort("OpenAI API key not configured.")
+ravel_openai_resp_text <- function(body) {
+  output <- body$output %||% list()
+  parts <- unlist(lapply(output, function(item) {
+    content <- item$content %||% list()
+    vapply(content, function(part) {
+      if (identical(part$type %||% "", "output_text")) {
+        return(part$text %||% "")
+      }
+      part$text %||% ""
+    }, character(1))
+  }), use.names = FALSE)
+
+  text <- paste(parts[nzchar(parts)], collapse = "\n")
+  if (nzchar(text)) {
+    return(text)
   }
 
+  body$output_text %||% ""
+}
+
+ravel_openai_responses_input <- function(messages) {
+  lines <- vapply(messages, function(msg) {
+    role <- msg$role %||% "user"
+    sprintf("%s: %s", toupper(role), as.character(msg$content %||% ""))
+  }, character(1))
+
+  paste(lines, collapse = "\n\n")
+}
+
+ravel_openai_chat_comps <- function(api_key, messages, context, model) {
   payload_messages <- ravel_normalize_messages(messages, context)
 
   req <- httr2::request("https://api.openai.com/v1/chat/completions") |>
@@ -45,10 +69,61 @@ ravel_openai_api_chat <- function(messages, context, model) {
   list(
     provider = "openai",
     auth_mode = "api_key",
+    api_mode = "chat_completions",
     model = body$model %||% model,
     content = ravel_openai_extract_text(content),
     raw = body
   )
+}
+
+ravel_openai_api_responses <- function(api_key, messages, context, model, settings) {
+  normalized <- ravel_normalize_messages(messages, context)
+  system_prompt <- normalized[[1]]$content
+  input_messages <- normalized[-1]
+
+  body <- list(
+    model = model,
+    instructions = system_prompt,
+    input = ravel_openai_responses_input(input_messages)
+  )
+
+  tools <- ravel_mcp_tools(settings$openai_mcp_tools %||% list())
+  if (length(tools)) {
+    body$tools <- tools
+  }
+
+  req <- httr2::request("https://api.openai.com/v1/responses") |>
+    httr2::req_headers(
+      Authorization = paste("Bearer", api_key),
+      `Content-Type` = "application/json"
+    ) |>
+    httr2::req_body_json(body)
+
+  resp <- ravel_perform_request(req, "OpenAI")
+  parsed <- httr2::resp_body_json(resp, simplifyVector = FALSE)
+
+  list(
+    provider = "openai",
+    auth_mode = "api_key",
+    api_mode = "responses",
+    model = parsed$model %||% model,
+    content = ravel_openai_resp_text(parsed),
+    raw = parsed
+  )
+}
+
+ravel_openai_api_chat <- function(messages, context, model, settings) {
+  api_key <- ravel_get_secret("openai", "api_key")
+  if (is.null(api_key)) {
+    cli::cli_abort("OpenAI API key not configured.")
+  }
+
+  api_mode <- settings$provider_api_modes$openai %||% "responses"
+  if (identical(api_mode, "chat_completions")) {
+    return(ravel_openai_chat_comps(api_key, messages, context, model))
+  }
+
+  ravel_openai_api_responses(api_key, messages, context, model, settings)
 }
 
 ravel_openai_codex_cli_chat <- function(messages, context, model) {
@@ -126,7 +201,7 @@ ravel_openai_chat <- function(messages, context, model, settings) {
   }
 
   result <- tryCatch(
-    ravel_openai_api_chat(messages, context, model),
+    ravel_openai_api_chat(messages, context, model, settings),
     error = function(e) e
   )
 
@@ -153,13 +228,15 @@ ravel_provider_openai <- function() {
     name = "openai",
     label = "OpenAI",
     auth_modes = c("api_key", "codex_cli"),
-    default_model = ravel_read_settings()$default_models$openai %||% "gpt-5.3-codex",
+    default_model = ravel_read_settings()$default_models$openai %||% "gpt-5.5",
     models = ravel_openai_models(),
     capabilities = list(
       code_generation = TRUE,
       stats_reasoning = TRUE,
       quarto_drafting = TRUE,
-      login_first = TRUE
+      login_first = TRUE,
+      responses_api = TRUE,
+      remote_mcp = TRUE
     ),
     is_available = function() {
       isTRUE(ravel_auth_status("openai")$configured)

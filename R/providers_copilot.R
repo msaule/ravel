@@ -102,7 +102,8 @@ ravel_provider_copilot <- function() {
       stats_reasoning = TRUE,
       quarto_drafting = TRUE,
       login_first = TRUE,
-      official_cli = TRUE
+      official_cli = TRUE,
+      cli_mcp_management = TRUE
     ),
     is_available = function() {
       isTRUE(ravel_auth_status("copilot")$configured)

@@ -1,3 +1,11 @@
+# ravel 0.1.2
+
+- Modernized provider defaults for the current OpenAI, Gemini, and Anthropic model lanes while keeping older model IDs selectable for compatibility.
+- Added OpenAI Responses API support as the default API-key path, with chat-completions retained as an explicit compatibility mode.
+- Added optional remote MCP tool declarations for providers that support MCP, beginning with OpenAI Responses API payloads.
+- Tightened file-action safety: approved file writes outside the detected project root are blocked by default unless explicitly allowed.
+- Documented the current sandbox boundary more clearly: Ravel provides approval-gated execution and a session-scoped R environment, not an operating-system sandbox.
+
 # ravel 0.1.1
 
 - Published on CRAN, so `install.packages("ravel")` now works for the stable release.
