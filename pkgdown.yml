@@ -1,0 +1,10 @@
+pandoc: 3.8.3
+pkgdown: 2.2.0
+pkgdown_sha: ~
+articles:
+  ravel-mvp: ravel-mvp.html
+  ravel-showcase: ravel-showcase.html
+last_built: 2026-06-28T18:00Z
+urls:
+  reference: https://msaule.github.io/ravel/reference
+  article: https://msaule.github.io/ravel/articles
